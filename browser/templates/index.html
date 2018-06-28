@@ -1,0 +1,468 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MABED</title>
+  <link rel="icon" href="static/images/favicon.ico">
+
+  <link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css"/>
+  <link title="timeline-styles" rel="stylesheet" href="https://cdn.knightlab.com/libs/timeline3/latest/css/timeline.css">
+  <!-- <link title="timeline-styles" rel="stylesheet" href="static/plugins/timeline/timeline.css"> -->
+  <link rel="stylesheet" href="static/plugins/d3/nv.d3.css">
+
+  <link rel="stylesheet" type="text/css" href="static/css/main.css"/>
+  <link rel="stylesheet" type="text/css" href="static/css/style.css" />
+  <link rel="stylesheet" type="text/css" href="static/css/jquery-confirm.css" />
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto|Poppins|Playfair+Display:300,400,900" rel="stylesheet">
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container" id="mabed-nav">
+
+      <a class="navbar-brand" href="#">MABED</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainMABEDnavbar" aria-controls="mainMABEDnavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainMABEDnavbar">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active" id="nav-home">
+            <a class="nav-link" href="#">Home</a>
+          </li>
+{#          <li class="nav-item dropdown">#}
+{#            <a class="nav-link" href="#mabed" >#}
+{#              MABED#}
+{#            </a>#}
+{#            <div class="dropdown-menu" aria-labelledby="navbarDropdown">#}
+{#              <a class="dropdown-item" href="#results">Results</a>#}
+{#            </div>#}
+{#          </li>#}
+          <li class="nav-item" id="nav-mabed">
+            <a class="nav-link" href="#mabed">Detect Events Using MABED</a>
+          </li>
+            <li class="nav-item" id="nav-results">
+            <a class="nav-link" href="#results">Results</a>
+          </li>
+
+          <li class="nav-item" id="nav-tweets">
+            <a class="nav-link" href="#tweets">Tweet Search</a>
+          </li>
+
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="nav-item" id="nav-events">
+            <a class="nav-link" href="#events"><i class="pixicon-map-pin-1-place-2" style="margin-right:5px;position:relative;top:2px;"></i> Events</a>
+          </li>
+          <li class="nav-item" id="nav-settings">
+            <a class="nav-link" href="#settings"><i class="pixicon-user-male-cog" style="margin-right:5px;position:relative;top:2px;"></i> Settings</a>
+          </li>
+        </ul>
+
+      </div>
+    </div>
+  </nav>
+
+  <div id="content"></div>
+
+
+  <!-- Templates -->
+  <script type="text/template" id="tpl-page-1">
+    <div class="pix-original-1 jarallax pix-padding-v-200 h-100">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-xs-12">
+            <div class="text-center jarallax" data-jarallax-element="-20" data-speed="">
+              <h6 class="pix-white display-1 font-black pix-no-margin"><span class="pix_edit_text">MABED</span></h6>
+              <div class="d-inline-block pix-white" style="background-color: rgba(0,0,0,0.45);border-radius: 50px;padding: 5px 8px 5px 5px;line-height: 0px;margin-bottom: 10px;"><span class="badge badge-pill badge-primary red-bg align-middle" style="margin-right: 3px; background: linear-gradient(to right, #fe2060 , #4100ff);" >New</span><span class="small-text font-bold align-middle"> Event Detection and Tracking in Twitter</span></div>
+              <h6 class="pix-gray lighten-2 pix-padding-v-20">
+                Say Hi 👋 to MABED!
+              </h6>
+              <a href="#mabed" class="btn btn-lg main-color-bg pix-white fly shadow">
+                <i class="pixicon-play"></i>
+                <strong class="">Start</strong>
+              </a>
+              <a href="#tweets" class="btn btn-lg btn-line btn-round-lg pix-white-line fly">
+                <i class="pixicon-document"></i>
+                <strong>Search Tweets</strong>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="container">
+      <div class="row">
+        <div class="col-12 pix-margin-v-30">
+          <div class="jumbotron gray-bg bg-lighten-4">
+            <h1 class="pix-gray darken-4 font-black">About</h1>
+            <span class="pix_edit_text">MABED (Mention-Anomaly-Based Event Detection) is a statistical method for automatically detecting significant events that most interest Twitter users from the stream of tweets they publish. In contrast with existing methods, it doesn't only focus on the textual content of tweets but also leverages the frequency of social interactions that occur between users (i.e. mentions). MABED also differs from the literature in that it dynamically estimates the period of time during which each event is discussed rather than assuming a predefined fixed duration for all events.</span>
+            <p class="lead">
+              <a class="btn btn-lg main-color-bg pix-white fly shadow scale" href="#results" role="button"><strong>Results</strong></a>
+            </p>
+          </div>
+        </div>
+        <div class="col-12 pix-margin-v-30">
+          <h3 class="pix-gray darken-4 font-black">References</h3>
+          <ul>
+            <li>
+              Adrien Guille and Cécile Favre (2015) Event detection, tracking, and visualization in Twitter: a mention-anomaly-based approach. Springer Social Network Analysis and Mining, vol. 5, iss. 1, art. 18 [DOI: 10.1007/s13278-015-0258-0]
+            </li>
+            <li>
+              Adrien Guille and Cécile Favre (2014) Mention-Anomaly-Based Event Detection and Tracking in Twitter. In Proceedings of the 2014 IEEE/ACM International Conference on Advances in Social Network Mining and Analysis (ASONAM 2014), pp. 375-382 [DOI: 10.1109/ASONAM.2014.6921613]
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" id="tpl-page-2">
+    <br><div id='timeline-embed' style="width: 100%; height: 800px;box-shadow: 0 4px 2px -2px rgba(0,0,0,0.2)"></div>
+    <div class="gray-bg bg-lighten-4 pix-padding-v-65">
+      <div class="container">
+        <div class="row">
+
+          <div class="col-12 pix-margin-top-10">
+            <h2 class="pix-gray darken-4 font-black"><span class="pix_edit_text">Event impact</span></h2>
+            <a href="#" id="reset_impact" class="btn btn-line green-bg pix-gray btn-sm">Reset</a>
+          </div>
+          <div class="col-12 pix-margin-top-10">
+            <div id="chartDiv"></div>
+
+          </div>
+
+
+          <div class="col-12 pix-margin-top-10">
+            <div class="card-columns" id="eventsClusters"></div>
+          </div>
+
+
+
+          <div class="col-12 pix-margin-top-10">
+            <h2 class="pix-gray darken-4 font-black"><span class="pix_edit_text">Tweets</span></h2>
+          </div>
+          <div class="col-12 loading_text">
+            <span class="badge badge-secondary">Loading...</span>
+          </div>
+          <div class="col-12" id="tweets_results">
+            <span id="res_num">-</span> results (<span id="res_time">-</span> seconds)
+          </div>
+          <div class="col-12" id="tweets_result">
+          </div>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" id="tpl-page-settings">
+    <div class="pix-padding-v-65">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 pix-margin-bottom-30">
+            <h2 class="pix-gray darken-4 font-black"><span class="pix_edit_text">Create Session</span></h2>
+          </div>
+          <div class="col-6 col-sm-12">
+            <form id="settings_form">
+              <div class="form-group">
+                <label for="session_name">Session name</label>
+                <input name="s_name" type="text" class="form-control" id="session_name" aria-describedby="session_name_help" placeholder="Enter Session Name">
+              </div>
+              <div class="form-group">
+                <label for="session_name">Session Index</label>
+                <input name="s_index" type="text" class="form-control" id="session_index" placeholder="Enter Session Index">
+              </div>
+
+              <div class="pix-margin-v-30">
+                <button name="save" type="submit" class="btn btn-primary btn-lg btn-flat"><b>Save</b></button>
+              </div>
+            </form>
+          </div>
+
+          <div class="col-12 pix-margin-v-30">
+            <h2 class="pix-gray darken-4 font-black"><span class="pix_edit_text">Switch Sessions</span></h2>
+          </div>
+
+          <div class="col-6 col-sm-12">
+            <form id="session_form">
+              <div class="input-group">
+                <select name="id" class="custom-select" id="sessionsList">
+                </select>
+                <div class="input-group-append">
+                  <button class="btn btn-outline-success" type="submit">Switch Session</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+
+          <div class="col-12 pix-margin-v-30">
+            <div class="pix-margin-v-50"><hr></div>
+            <h2 class="pix-gray darken-4 font-black"><span class="pix_edit_text">Current Session</span></h2>
+          </div>
+          <div class="col-6 col-sm-12">
+            <div>
+              Session Name: <span id="cs_name"></span> <br>
+              Session Index: <span id="cs_index"></span> <br>
+              Session Document Type: <span id="cs_type"></span> <br>
+              Session ID: <span id="cs_id"></span> <br>
+            </div>
+            <div>
+              <a href="#" class="btn red-bg pix-white fly" id="deleteSession">
+              	<strong>Delete Current Session</strong>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </script>
+
+
+  <script type="text/template" id="tpl-page-tweets">
+    <div class="pix-padding-v-65 gray-bg bg-lighten-4">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 pix-margin-bottom-30">
+            <h2 class="pix-gray darken-4 font-black"><span class="pix_edit_text">Tweets Search</span></h2>
+          </div>
+
+          <div class="col-6 col-sm-12">
+            <form id="tweets_form">
+              <label for="word">Enter the search string</label>
+              <a href="#tweets" class="popover-dismiss" data-placement="bottom">
+                <i class="pixicon-question-circle" style="margin-right:5px;position:relative;top:2px;"></i>
+              </a>
+              <div class="input-group mb-3">
+                <input name="word" type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-success" type="submit">Search</button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="col-12 loading_text">
+            <span class="badge badge-secondary">Loading...</span>
+          </div>
+          <div class="col-12" id="tweets_results">
+            <span id="res_num">12342</span> results (<span id="res_time">0.1</span> seconds)
+          </div>
+
+          <div class="col-12 pix-margin-top-10">
+            <div class="card-columns" id="imagesClusters"></div>
+          </div>
+
+
+          <div class="col-12" id="tweets_result">
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" id="tpl-item-tweet">
+    <div class="pix-margin-top-10">
+      <div class="media pix-padding-10 white-bg bs_box tweet_box <%= classes %>">
+        <img class="align-self-start mr-3 rounded-circle" src="https://twitter.com/<%= screen_name %>/profile_image?size=original" style="width:60px;height:auto;" alt="">
+        <div class="media-body">
+            <div class="tweet_options">
+                <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <b>Options</b>
+              </button>
+              <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="#">Mark all user tweets as Confirmed</a>
+                <a class="dropdown-item" href="#">Mark all user tweets as Negative</a>
+                  <a class="dropdown-item tweet_state" href="#" data-tid="<%= tid %>" data-val="proposed">Reset as Proposed</a>
+              </div>
+
+                <a href="#" class="btn btn-sm tweet_state btn-outline-success" data-tid="<%= tid %>" data-val="confirmed">
+                    <strong>Confirmed</strong>
+                </a>
+                <a href="#" class="btn btn-sm tweet_state btn-outline-danger" data-tid="<%= tid %>"  data-val="negative">
+                    <strong>Negative</strong>
+                </a>
+
+            </div>
+          <div>
+            <span class="mt-0 t_name"><%= name %></span>
+            <span class="pix-black secondary-font t_user"><a href="https://twitter.com/<%= screen_name %>" target="_blank">@<%= screen_name %></a></span>
+          </div>
+            <div class="t_state">
+                <%= state %>
+            </div>
+          <a class="t_date" href="<%= link %>" target="_blank"><%= created_at %></a>
+          <p class="pix-black t_text"><%= text %></p>
+          <p><%= images %></p>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" id="tpl-page-mabed">
+    <div class="pix-padding-v-65 gray-bg bg-lighten-4">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 pix-margin-bottom-30">
+            <h2 class="pix-gray darken-4 font-black">Run MABED</h2>
+          </div>
+
+          <div class="col-12 col-sm-12">
+            <form class="static_box pix-padding-20 white-bg" id="run_mabed">
+              <div class="form-row">
+                <div class="col-md-3 col-sm-12 h_field">
+                  <label for="inputState">Filter</label>
+                  <select name="filter" id="inputState" class="form-control">
+                    <option value="all" selected>All Tweets</option>
+                    <option value="proposed">Proposed</option>
+                    <option value="negative">Negative</option>
+                    <option value="confirmed">Confirmed</option>
+                      <option value="proposedconfirmed">Proposed + Confirmed</option>
+                  </select>
+                </div>
+                <div class="col-md-3 col-sm-12 h_field">
+                  <label for="top_events">Number of top events to detect</label>
+                  <input id="top_events" name="top_events" type="number" class="form-control" placeholder="Default to 10" value="10">
+                </div>
+                <div class="col-md-3 col-sm-12 h_field">
+                  <label for="min_absolute_frequency">Minimum absolute word frequency</label>
+                  <input id="min_absolute_frequency" name="min_absolute_frequency" type="text" class="form-control" placeholder="Default to 10" value="10">
+                </div>
+                <div class="col-md-3 col-sm-12 h_field">
+                  <label for="max_relative_frequency">Maximum absolute word frequency</label>
+                  <input id="max_relative_frequency" name="max_relative_frequency" type="text" class="form-control" placeholder="Default to 0.4" value="0.4">
+                </div>
+                <div class="col-md-4 col-sm-12 h_field">
+                  <label for="time_slice_length">Time-slice length</label>
+                  <div class="input-group mb-3">
+                    <input id="time_slice_length" aria-describedby="basic-addon1" name="time_slice_length" type="text" class="form-control" placeholder="Default to 30" value="30">
+                    <div class="input-group-append">
+                      <span class="input-group-text" id="basic-addon1">minutes</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4 col-sm-12 h_field">
+                  <label for="p_value">Number of candidate words</label>
+                  <div class="input-group mb-3">
+                    <input id="p_value" name="p_value" aria-describedby="basic-addon2" type="number" class="form-control" placeholder="Default to 10" value="10">
+                    <div class="input-group-append">
+                      <span class="input-group-text" id="basic-addon2">per event</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-2 col-sm-12 h_field">
+                  <label for="t_value">Theta</label>
+                  <input id="t_value" name="t_value" type="text" class="form-control" placeholder="Default to 0.6" value="0.6">
+                </div>
+                <div class="col-md-2 col-sm-12 h_field">
+                  <label for="s_value">Sigma</label>
+                  <input id="s_value" name="s_value" type="text" class="form-control" placeholder="Default to 0.6" value="0.6">
+                </div>
+              </div>
+                <button class="btn btn-lg btn-flat btn-success" style="width:100%" type="submit"><strong>RUN</strong></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pix-padding-v-65">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-sm-12 pix-margin-v-30" id="mabed_loading" style="display:none;">
+            <div class="spinner"></div>
+            Loading...
+          </div>
+          <div class="col-12 col-sm-12 pix-margin-v-30">
+            <div id="mabed_result"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </script>
+
+
+  <script type="text/template" id="tpl-page-events">
+      <div class="pix-padding-v-65">
+      <div class="container">
+        <div class="row">
+            <div class="col-12 pix-margin-bottom-30">
+            <h2 class="pix-gray darken-4 font-black">Events</h2>
+          </div>
+          <div class="col-12 col-sm-12 pix-margin-v-30">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Time</th>
+                  <th scope="col">Main terms</th>
+                  <th scope="col">Related terms</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2017-12-07 06:00 | 2017-12-11 10:00</td>
+                  <td>fdl2017</td>
+                  <td>onlylyon, fetesdeslumieres, fetedeslumieres, prefetrhone, fetelumieres, cluster97</td>
+                </tr>
+                <tr>
+                  <td>2017-12-07 06:00 | 2017-12-11 10:00</td>
+                  <td>fdl2017</td>
+                  <td>onlylyon, fetesdeslumieres, fetedeslumieres, prefetrhone, fetelumieres, cluster97</td>
+                </tr>
+              <tr>
+                  <td>2017-12-07 06:00 | 2017-12-11 10:00</td>
+                  <td>fdl2017</td>
+                  <td>onlylyon, fetesdeslumieres, fetedeslumieres, prefetrhone, fetelumieres, cluster97</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+            <div class="col-12 pix-margin-bottom-30">
+            <hr>
+                <a href="#" class="btn btn-lg btn-flat btn-success" ><strong>Export events .json File</strong></a>
+                <a href="#" class="btn btn-lg btn-flat btn-success" ><strong>Export tweets .json File</strong></a>
+          </div>
+            </div>
+          </div>
+          </div>
+  </script>
+
+  <script src="https://cdn.knightlab.com/libs/timeline3/latest/js/timeline.js"></script>
+  <script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
+  <script src="static/js/vendor/jquery-1.10.2.min.js"></script>
+  <script src="static/js/vendor/bootstrap.min.js"></script>
+  <script src="http://underscorejs.org/underscore-min.js"></script>
+  <script src="static/js/vendor/backbone.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.js"></script>
+
+  <script src="static/plugins/d3/d3.min.js"></script>
+  <script src="static/plugins/d3/nv.d3.min.js"></script>
+
+  <script src="static/js/App.js"></script>
+  <script src="static/js/views/home.js"></script>
+  <script src="static/js/views/client.js"></script>
+  <script src="static/js/views/settings.js"></script>
+  <script src="static/js/views/mabed.js"></script>
+  <script src="static/js/views/tweets.js"></script>
+  <script src="static/js/views/events.js"></script>
+  <script src="static/js/models/event.js"></script>
+  <script src="static/js/collections/events.js"></script>
+
+  <script src="static/js/vendor/jarallax.min.js"></script>
+  <script src="static/js/vendor/jarallax-element.min.js"></script>
+  <script src="static/js/vendor/jarallax-video.min.js"></script>
+
+
+  <script>
+  window.onload = function() {
+    app.init();
+  }
+</script>
+</body>
+
+</html>

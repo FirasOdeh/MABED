@@ -5,7 +5,7 @@ import timeit
 import argparse
 
 # mabed
-from mabed.corpus import Corpus
+from mabed.es_corpus import Corpus
 from mabed.mabed import MABED
 import mabed.utils as utils
 

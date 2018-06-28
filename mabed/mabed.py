@@ -200,3 +200,6 @@ class MABED:
         print('   Top %d events:' % len(self.events))
         for event in self.events:
             self.print_event(event)
+
+    def get_events(self):
+        return self.events
