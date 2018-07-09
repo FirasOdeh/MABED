@@ -23,7 +23,7 @@ class Functions:
     # Event Detection
     # ==================================================================
 
-    def detect_events(self, index="test3", k=10, maf=10, mrf=0.4, tsl=30, p=10, theta=0.6, sigma=0.6):
+    def detect_events(self, index="test3", k=10, maf=10, mrf=0.4, tsl=30, p=10, theta=0.6, sigma=0.6, cluster=2):
         sw = 'stopwords/twitter_all.txt'
         sep = '\t'
         print('Parameters:')
@@ -41,7 +41,7 @@ class Functions:
         time_slice_length = tsl
         print('Partitioning tweets into %d-minute time-slices...' % time_slice_length)
         start_time = timeit.default_timer()
-        my_corpus.discretize(time_slice_length)
+        my_corpus.discretize(time_slice_length, cluster)
         elapsed = timeit.default_timer() - start_time
         print('Partitioning done in %f seconds.' % elapsed)
 
@@ -54,8 +54,8 @@ class Functions:
         return mabed
 
 
-    def event_descriptions(self, index="test3", k=10, maf=10, mrf=0.4, tsl=30, p=10, theta=0.6, sigma=0.6):
-        mabed = self.detect_events(index, k, maf, mrf, tsl, p, theta, sigma)
+    def event_descriptions(self, index="test3", k=10, maf=10, mrf=0.4, tsl=30, p=10, theta=0.6, sigma=0.6, cluster=2):
+        mabed = self.detect_events(index, k, maf, mrf, tsl, p, theta, sigma, cluster)
 
         # format data
         event_descriptions = []
@@ -91,7 +91,7 @@ class Functions:
         return {"event_descriptions": event_descriptions, "impact_data": impact_data}
 
 
-    def detect_filtered_events(self, index="test3", k=10, maf=10, mrf=0.4, tsl=30, p=10, theta=0.6, sigma=0.6, session=False, filter=False):
+    def detect_filtered_events(self, index="test3", k=10, maf=10, mrf=0.4, tsl=30, p=10, theta=0.6, sigma=0.6, session=False, filter=False, cluster=2):
         sw = 'stopwords/twitter_all.txt'
         sep = '\t'
         print('Parameters:')
@@ -112,7 +112,7 @@ class Functions:
         time_slice_length = tsl
         print('Partitioning tweets into %d-minute time-slices...' % time_slice_length)
         start_time = timeit.default_timer()
-        my_corpus.discretize(time_slice_length)
+        my_corpus.discretize(time_slice_length, cluster)
         elapsed = timeit.default_timer() - start_time
         print('Partitioning done in %f seconds.' % elapsed)
 
@@ -124,8 +124,8 @@ class Functions:
         print('Event detection performed in %f seconds.' % elapsed)
         return mabed
 
-    def filtered_event_descriptions(self, index="test3", k=10, maf=10, mrf=0.4, tsl=30, p=10, theta=0.6, sigma=0.6, session=False, filter=False):
-        mabed = self.detect_filtered_events(index, k, maf, mrf, tsl, p, theta, sigma, session, filter)
+    def filtered_event_descriptions(self, index="test3", k=10, maf=10, mrf=0.4, tsl=30, p=10, theta=0.6, sigma=0.6, session=False, filter=False, cluster=2):
+        mabed = self.detect_filtered_events(index, k, maf, mrf, tsl, p, theta, sigma, session, filter, cluster)
         if not mabed:
             return False
 
@@ -191,6 +191,22 @@ class Functions:
         #           }
         #     })
         return res['hits']['hits']
+
+    def get_big_tweets(self, index="test3", word=""):
+        my_connector = Es_connector(index=index)
+        res = my_connector.bigSearch(
+            {
+                "_source": ["text", "id_str", "extended_entities", "user", "created_at", "link"],
+                "query": {
+                    "simple_query_string": {
+                      "fields": [
+                        "text"
+                      ],
+                      "query": word
+                    }
+                  }
+            })
+        return res
 
 
     def get_event_tweets(self, index="test3", main_term="", related_terms=""):
@@ -382,6 +398,32 @@ class Functions:
         print(query)
         res = my_connector.search(query)
         return res
+
+    def get_valid_tweets(self, index="test3"):
+        my_connector = Es_connector(index=index)
+        res = my_connector.search({
+                "query": {
+                    "simple_query_string": {
+                      "fields": [
+                        "text"
+                      ],
+                      "query": word
+                    }
+                  }
+                })
+        # res = my_connector.bigSearch(
+        #     {
+        #         "_source": ["text", "id_str", "extended_entities", "user", "created_at", "link"],
+        #         "query": {
+        #             "simple_query_string": {
+        #               "fields": [
+        #                 "text"
+        #               ],
+        #               "query": word
+        #             }
+        #           }
+        #     })
+        return res['hits']['hits']
 
 
     # ==================================================================
@@ -674,6 +716,18 @@ class Functions:
 
         return res
 
+    def set_cluster_state(self, index, session, cid, state):
+        tweets_connector = Es_connector(index=index, doc_type="tweet")
+        # All tweets
+        session = 'session_'+session
+        query = {
+                "query": {
+                        "term" : { "imagesCluster": cid }
+                    }
+                }
+        res = tweets_connector.update_query(query, session, state)
+        return res
+
     def set_tweet_state(self, index, session, tid, val):
         tweets_connector = Es_connector(index=index, doc_type="tweet")
         session = 'session_'+session
@@ -685,3 +739,7 @@ class Functions:
         }
         res = tweets_connector.update(tid, query)
         return res
+
+
+    def export_event(self):
+        return "events"

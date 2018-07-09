@@ -23,7 +23,7 @@ __email__ = "odehfiras@gmail.com"
 
 class Corpus:
 
-    def __init__(self, stopwords_file_path, min_absolute_freq=10, max_relative_freq=0.4, separator='\t', save_voc=False, index="test2", session= False, filter= False):
+    def __init__(self, stopwords_file_path, min_absolute_freq=10, max_relative_freq=0.4, separator='\t', save_voc=False, index="test2", session= False, filter= False, cluster=2):
         self.size = 0
         self.start_date = '3000-01-01 00:00:00'
         self.end_date = '1000-01-01 00:00:00'
@@ -46,16 +46,17 @@ class Corpus:
                 tweet_text = line['_source']['text']
                 if 'imagesCluster' in line['_source']:
                     arr = line['_source']['imagesCluster']
-                    cluster = ""
-                    if isinstance(arr, list):
-                        for cl in arr:
-                            cluster = cluster + ' Cluster' + str(cl)+ ' '
-                    else:
-                        cluster = ' Cluster'+ str(line['_source']['imagesCluster'])
-                    cluster = cluster + cluster
-                    # print(cluster)
-                    tweet_text = tweet_text + cluster
-
+                    if arr:
+                        cluster_str = ""
+                        cluster_temp = ""
+                        if isinstance(arr, list):
+                            for cl in arr:
+                                cluster_temp = cluster_temp + ' Cluster' + str(cl)+ ' '
+                        else:
+                            cluster_temp = ' Cluster'+ str(arr)
+                        for x in range(cluster):
+                            cluster_str = cluster_str + cluster_temp
+                        tweet_text = tweet_text + cluster_str
                 words = self.tokenize(tweet_text)
                 date = line['_source']['timestamp_ms']
                 if date > self.end_date:
@@ -100,7 +101,7 @@ class Corpus:
             self.time_slice_length = None
 
 
-    def discretize(self, time_slice_length):
+    def discretize(self, time_slice_length, cluster = 2):
         self.time_slice_length = time_slice_length
 
         # clean the data directory
@@ -133,17 +134,20 @@ class Corpus:
             self.tweet_count[time_slice] += 1
             # tokenize the tweet and update word frequency
             tweet_text = line['_source']['text']
-            cluster = ""
             if 'imagesCluster' in line['_source']:
                 arr = line['_source']['imagesCluster']
-                if isinstance(arr, list):
-                    for cl in arr:
-                        cluster = cluster + ' Cluster' + str(cl) + ' '
-                else:
-                    cluster = ' Cluster' + str(line['_source']['imagesCluster'])
-                cluster = cluster + cluster
-                # print(cluster)
-            tweet_text = tweet_text + cluster
+                if arr:
+                    cluster_str = ""
+                    cluster_temp = ""
+                    if isinstance(arr, list):
+                        for cl in arr:
+                            cluster_temp = cluster_temp + ' Cluster' + str(cl) + ' '
+                    else:
+                        cluster_temp = ' Cluster' + str(arr)
+                    for x in range(cluster):
+                        cluster_str = cluster_str + cluster_temp
+                    tweet_text = tweet_text + cluster_str
+
             words = self.tokenize(tweet_text)
             mention = '@' in tweet_text
             for word in set(words):
