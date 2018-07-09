@@ -10,6 +10,8 @@ from flask import Flask, render_template, request
 from flask import jsonify
 from flask_cors import CORS, cross_origin
 from flask_frozen import Freezer
+from flask import Response
+
 
 # mabed
 from mabed.functions import Functions
@@ -97,16 +99,17 @@ def detect_events():
     sigma = float(data['s_value'])
     session = data['session']
     filter = data['filter']
+    cluster = int(data['cluster'])
     events=""
     res = False
     if filter=="all":
         events = "all events"
-        events = functions.event_descriptions(index, k, maf, mrf, tsl, p, theta, sigma)
+        events = functions.event_descriptions(index, k, maf, mrf, tsl, p, theta, sigma, cluster)
     elif filter == "proposedconfirmed":
         filter = ["proposed","confirmed"]
-        events = functions.filtered_event_descriptions(index, k, maf, mrf, tsl, p, theta, sigma, session, filter)
+        events = functions.filtered_event_descriptions(index, k, maf, mrf, tsl, p, theta, sigma, session, filter, cluster)
     else:
-        events = functions.filtered_event_descriptions(index, k, maf, mrf, tsl, p, theta, sigma, session, [filter])
+        events = functions.filtered_event_descriptions(index, k, maf, mrf, tsl, p, theta, sigma, session, [filter], cluster)
 
     if not events:
         events = "No Result!"
@@ -175,18 +178,26 @@ def cluster_tweets():
     event = json.loads(data['obj'])
     main_term = event['main_term'].replace(",", " ")
     related_terms = event['related_terms']
-
-    clusters = functions.get_event_clusters(index, main_term, related_terms)
-
+    # clusters = functions.get_event_clusters(index, main_term, related_terms)
     tres = functions.get_event_tweets2(index, main_term, related_terms, cid)
     event_tweets = tres
     # event_tweets = 0
-
-
     res = functions.get_cluster_tweets(index, cid)
     tweets = res['hits']['hits']
     return jsonify({"tweets": tweets, "event_tweets": event_tweets})
 
+# Get Search Image Cluster tweets
+@app.route('/cluster_search_tweets', methods=['POST', 'GET'])
+@cross_origin()
+def cluster_search_tweets():
+    data = request.form
+    index = data['index']
+    cid = data['cid']
+    word = data['word']
+    search_tweets = functions.get_big_tweets(index=index, word=word)
+    res = functions.get_cluster_tweets(index, cid)
+    tweets = res['hits']['hits']
+    return jsonify({"tweets": tweets, "search_tweets": search_tweets})
 
 # Get Event main image
 @app.route('/event_image', methods=['POST'])
@@ -214,7 +225,7 @@ def event_image():
 #   - Keyword (Search page)
 #   - Cluster (Cluster card options)
 
-# Run MABED
+# Test & Debug
 @app.route('/mark_valid', methods=['POST', 'GET'])
 @cross_origin()
 def mark_valid():
@@ -235,6 +246,17 @@ def mark_event():
     functions.set_status(index, session, data)
     return jsonify(data)
 
+@app.route('/mark_cluster', methods=['POST', 'GET'])
+@cross_origin()
+def mark_cluster():
+    data = request.form
+    print(data)
+    index = data['index']
+    session = data['session']
+    cid = data['cid']
+    state = data['state']
+    res = functions.set_cluster_state(index, session, cid, state)
+    return jsonify(res)
 
 @app.route('/mark_tweet', methods=['POST', 'GET'])
 @cross_origin()
@@ -258,7 +280,55 @@ def delete_field():
     return jsonify(up1)
 
 # ==================================================================
-# 5. Sessions
+# 5. Export
+# ==================================================================
+
+@app.route('/export_events', methods=['POST', 'GET'])
+@cross_origin()
+def export_events():
+    # data = request.form
+    # session = data['session_id']
+    # res = functions.get_session(session)
+    res = functions.get_session('6n7aD2QBU2R9ngE9d8IB')
+    index = res['_source']['s_index']
+    events = json.loads(res['_source']['events'])
+    for event in events:
+        main_term = event['main_term'].replace(",", " ")
+        # event['main_term']=main_term
+        related_terms = event['related_terms']
+        # tweets = functions.get_event_tweets(index, main_term, related_terms)
+        # tweets = tweets['hits']['hits']
+        event['tweets'] = 'tweets'
+
+    return jsonify(events)
+    # return Response(str(events),
+    #     mimetype='application/json',
+    #     headers={'Content-Disposition': 'attachment;filename=events.json'})
+
+@app.route('/export_tweets', methods=['POST', 'GET'])
+@cross_origin()
+def export_tweets():
+    # data = request.form
+    # session = data['session_id']
+    # res = functions.get_session(session)
+    res = functions.get_session('6n7aD2QBU2R9ngE9d8IB')
+    index = res['_source']['s_index']
+    events = json.loads(res['_source']['events'])
+    for event in events:
+        main_term = event['main_term'].replace(",", " ")
+        # event['main_term']=main_term
+        related_terms = event['related_terms']
+        # tweets = functions.get_event_tweets(index, main_term, related_terms)
+        # tweets = tweets['hits']['hits']
+        event['tweets'] = 'tweets'
+
+    return jsonify(events)
+    # return Response(str(events),
+    #     mimetype='application/json',
+    #     headers={'Content-Disposition': 'attachment;filename=events.json'})
+
+# ==================================================================
+# 6. Sessions
 # ==================================================================
 
 # Get Sessions
