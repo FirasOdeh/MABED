@@ -154,8 +154,6 @@ app.views.client = Backbone.View.extend({
 						}
 					}
 				});
-
-
 			return false;
 		},
 		get_tweets_html: function(response, classes, cid){
@@ -169,6 +167,7 @@ app.views.client = Backbone.View.extend({
 					$.each(response.event_tweets, function(i2, t){
 						if(t._source.id_str===tweet._source.id_str){
 							detected=true;
+							return false;
 						}
 					});
 					if(!detected){
@@ -209,7 +208,7 @@ app.views.client = Backbone.View.extend({
 		display_tweets: function(response, t0, eid){
 			var html = this.get_tweets_html(response, '');
 			var chtml = "";
-			var cbtn = "";
+			var cbtn = "", state_btns="";
 			var i = 0;
 			$.each(response.clusters, function(i, cluster){
 				if(i>=20){return false;}
@@ -220,15 +219,21 @@ app.views.client = Backbone.View.extend({
 				}
 				if(eid){
 					cbtn = '<a href="#" class="btn btn-primary btn-flat cluster_tweets" data-eid="'+eid+'" data-cid="'+cluster.key+'"><strong>Show tweets</strong></a>';
+					state_btns = '<div class="cluster_state_btns">';
+					state_btns += '<a href="#" class="btn btn-outline-success" data-eid="'+eid+'" data-cid="'+cluster.key+'"><strong>Confirmed</strong></a>';
+					state_btns += ' <a href="#" class="btn btn-outline-danger" data-eid="'+eid+'" data-cid="'+cluster.key+'"><strong>Negative</strong></a>';
+					state_btns += '</div>';
 				}
 				chtml += '<div class="card p-3 '+cbg+'">'+
 					'<img class="card-img-top" src="http://localhost/TwitterImages/'+app.session.s_index+'/'+cluster.image+'" alt="">'+
+					state_btns+
 					'<div class="card-body">'+
 						'<p class="card-text">'+cluster.doc_count+' related tweets contain this image</p>'+
 						// '<p class="card-text">'+cluster.size2+' related tweets contain this image</p>'+
 						'<p class="card-text">Cluster size: '+cluster.size+'</p>'+
 						'<p class="card-text">Cluster ID: '+cluster.key+'</p>'+
 						cbtn+
+
 					'</div>'+
 				'</div>';
 			});

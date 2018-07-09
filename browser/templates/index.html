@@ -251,7 +251,7 @@
             <span class="badge badge-secondary">Loading...</span>
           </div>
           <div class="col-12" id="tweets_results">
-            <span id="res_num">12342</span> results (<span id="res_time">0.1</span> seconds)
+            <span id="res_num">0</span> results (<span id="res_time">0.1</span> seconds)
           </div>
 
           <div class="col-12 pix-margin-top-10">
@@ -277,8 +277,8 @@
                 <b>Options</b>
               </button>
               <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" href="#">Mark all user tweets as Confirmed</a>
-                <a class="dropdown-item" href="#">Mark all user tweets as Negative</a>
+{#                <a class="dropdown-item" href="#">Mark all user tweets as Confirmed</a>#}
+{#                <a class="dropdown-item" href="#">Mark all user tweets as Negative</a>#}
                   <a class="dropdown-item tweet_state" href="#" data-tid="<%= tid %>" data-val="proposed">Reset as Proposed</a>
               </div>
 
@@ -338,7 +338,7 @@
                   <label for="max_relative_frequency">Maximum absolute word frequency</label>
                   <input id="max_relative_frequency" name="max_relative_frequency" type="text" class="form-control" placeholder="Default to 0.4" value="0.4">
                 </div>
-                <div class="col-md-4 col-sm-12 h_field">
+                <div class="col-md-3 col-sm-12 h_field">
                   <label for="time_slice_length">Time-slice length</label>
                   <div class="input-group mb-3">
                     <input id="time_slice_length" aria-describedby="basic-addon1" name="time_slice_length" type="text" class="form-control" placeholder="Default to 30" value="30">
@@ -347,7 +347,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-md-4 col-sm-12 h_field">
+                <div class="col-md-3 col-sm-12 h_field">
                   <label for="p_value">Number of candidate words</label>
                   <div class="input-group mb-3">
                     <input id="p_value" name="p_value" aria-describedby="basic-addon2" type="number" class="form-control" placeholder="Default to 10" value="10">
@@ -355,6 +355,10 @@
                       <span class="input-group-text" id="basic-addon2">per event</span>
                     </div>
                   </div>
+                </div>
+                  <div class="col-md-2 col-sm-12 h_field">
+                  <label for="cluster">Cluster weight</label>
+                  <input id="cluster" name="cluster" type="number" class="form-control" placeholder="Default 2" value="2">
                 </div>
                 <div class="col-md-2 col-sm-12 h_field">
                   <label for="t_value">Theta</label>
