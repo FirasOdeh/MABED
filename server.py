@@ -423,4 +423,5 @@ def ind():
 
 if __name__ == '__main__':
     functions = Functions()
-    app.run(debug=True, host='localhost', port=5000, threaded=True)
+    # app.run(debug=True, host='localhost', port=5000, threaded=True)
+    app.run(debug=True, host='206.189.211.142', port=5000, threaded=True)
