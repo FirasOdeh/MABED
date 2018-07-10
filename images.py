@@ -20,7 +20,8 @@ if __name__ == '__main__':
     print('Number of clusters: %d' % len(data['duplicates']))
 
     # my_connector = Es_connector(index="twitter2016")
-    my_connector = Es_connector(index=args.i)
+    # my_connector = Es_connector(index=args.i)
+    my_connector = Es_connector(index=args.i, host='localhost', user='', password='')
     imgs = 0
     count = 0
     c_count = 0
