@@ -12,7 +12,7 @@ var app = (function() {
 		imagesURL: 'http://localhost/TwitterImages/',
 		// appURL: 'http://localhost:5000/',
 		// appURL: 'http://mediamining.univ-lyon2.fr:5000/',
-		appURL: 'http://206.189.211.142/:5000/',
+		appURL: 'http://206.189.211.142:5000/',
 		init: function() {
 			this.content = $("#content");
 
