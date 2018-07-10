@@ -34,7 +34,7 @@ app.views.client = Backbone.View.extend({
 				});
 				var s_ev = app.eventsCollection.get({ cid: timeline.config.events[0].unique_id }).toJSON();
 				var t0 = performance.now();
-				$.post('http://localhost:2016/event_tweets', {obj: JSON.stringify(s_ev), index: app.session.s_index}, function(response){
+				$.post(app.appURL+'event_tweets', {obj: JSON.stringify(s_ev), index: app.session.s_index}, function(response){
 					self.display_tweets(response, t0, timeline.config.events[0].unique_id);
 				}, 'json');
 
@@ -44,7 +44,7 @@ app.views.client = Backbone.View.extend({
 						$('#tweets_results').fadeOut('slow');
 			      $('.loading_text').fadeIn('slow');
 			      var t0 = performance.now();
-					$.post('http://localhost:2016/event_tweets', {obj: JSON.stringify(ev), index: app.session.s_index}, function(response){
+					$.post(app.appURL+'event_tweets', {obj: JSON.stringify(ev), index: app.session.s_index}, function(response){
 						self.display_tweets(response, t0, data.unique_id);
 					}, 'json');
 				});
@@ -102,7 +102,7 @@ app.views.client = Backbone.View.extend({
 			$('#tweets_results').fadeOut('slow');
 			$('.loading_text').fadeIn('slow');
 			var t0 = performance.now();
-			$.post('http://localhost:2016/tweets', {word:word, index: app.session.s_index}, function(response){
+			$.post(app.appURL+'tweets', {word:word, index: app.session.s_index}, function(response){
 						self.display_tweets(response, t0);
 			}, 'json');
 
@@ -118,7 +118,7 @@ app.views.client = Backbone.View.extend({
 			data.push({name: "event", value: s_ev});
 			data.push({name: "status", value: $(e.currentTarget).data("status")});
 
-			$.post('http://localhost:2016/mark_event', data, function(response){
+			$.post(app.appURL+'mark_event', data, function(response){
 						console.log(response);
 			}, 'json');
 			return false;
@@ -141,7 +141,7 @@ app.views.client = Backbone.View.extend({
 					onContentReady: function () {
 
 						var jc = this;
-						$.post('http://localhost:2016/cluster_tweets', {cid: cid, index: app.session.s_index, obj: JSON.stringify(ev)}, function(response){
+						$.post(app.appURL+'cluster_tweets', {cid: cid, index: app.session.s_index, obj: JSON.stringify(ev)}, function(response){
 							var html = self.get_tweets_html(response, 'static_tweet_box', cid);
 							self.delegateEvents();
 							jc.setContent(html);
@@ -180,7 +180,8 @@ app.views.client = Backbone.View.extend({
 									if(media.media_url.endsWith("png")){
 										ext = "png";
 									}
-										imgs += '<a href="http://localhost/TwitterImages/'+app.session.s_index+'/'+tweet._source.id_str+"_"+i+'.'+ext+'" target="_blank"><img style="margin:2px;max-height:150px;width:auto;" src="http://localhost/TwitterImages/'+app.session.s_index+'/'+tweet._source.id_str+"_"+i+'.'+ext+'"></a>'
+										// imgs += '<a href="http://localhost/TwitterImages/'+app.session.s_index+'/'+tweet._source.id_str+"_"+i+'.'+ext+'" target="_blank"><img style="margin:2px;max-height:150px;width:auto;" src="http://localhost/TwitterImages/'+app.session.s_index+'/'+tweet._source.id_str+"_"+i+'.'+ext+'"></a>'
+										imgs += '<a href="'+app.imagesURL+app.session.s_index+'/'+tweet._source.id_str+"_"+i+'.'+ext+'" target="_blank"><img style="margin:2px;max-height:150px;width:auto;" src="'+app.imagesURL+app.session.s_index+'/'+tweet._source.id_str+"_"+i+'.'+ext+'"></a>'
 				  });
 				}
 				var state = tweet._source['session_'+app.session.s_name];
@@ -225,7 +226,7 @@ app.views.client = Backbone.View.extend({
 					state_btns += '</div>';
 				}
 				chtml += '<div class="card p-3 '+cbg+'">'+
-					'<img class="card-img-top" src="http://localhost/TwitterImages/'+app.session.s_index+'/'+cluster.image+'" alt="">'+
+					'<img class="card-img-top" src="'+app.imagesURL+app.session.s_index+'/'+cluster.image+'" alt="">'+
 					state_btns+
 					'<div class="card-body">'+
 						'<p class="card-text">'+cluster.doc_count+' related tweets contain this image</p>'+
@@ -254,7 +255,7 @@ app.views.client = Backbone.View.extend({
 		var val = $(e.currentTarget).data("val");
 		var el = $(e.currentTarget).closest('.media-body').find('.t_state');
 		console.log(el);
-		$.post('http://localhost:2016/mark_tweet', {tid: tid, index: app.session.s_index, session: app.session.s_name, val: val}, function(response){
+		$.post(app.appURL+'mark_tweet', {tid: tid, index: app.session.s_index, session: app.session.s_name, val: val}, function(response){
 			console.log(response);
 			var state = val;
 				if(state === "confirmed"){

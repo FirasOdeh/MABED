@@ -40,7 +40,7 @@ app.views.tweets = Backbone.View.extend({
       var data = $('#tweets_form').serializeArray();
       data.push({name: "index", value: app.session.s_index});
       var self = this;
-      $.post('http://localhost:2016/tweets', data, function(response){
+      $.post(app.appURL+'tweets', data, function(response){
         self.display_tweets(response, t0, data[0].value);
       }, 'json');
 
@@ -70,7 +70,8 @@ app.views.tweets = Backbone.View.extend({
                     if(media.media_url.endsWith("png")){
                         ext = "png";
                     }
-                        imgs += '<a href="http://localhost/TwitterImages/'+app.session.s_index+'/'+tweet._source.id_str+"_"+i+'.'+ext+'" target="_blank"><img style="margin:2px;max-height:150px;width:auto;" src="http://localhost/TwitterImages/'+app.session.s_index+'/'+tweet._source.id_str+"_"+i+'.'+ext+'"></a>'
+                        // imgs += '<a href="http://localhost/TwitterImages/'+app.session.s_index+'/'+tweet._source.id_str+"_"+i+'.'+ext+'" target="_blank"><img style="margin:2px;max-height:150px;width:auto;" src="http://localhost/TwitterImages/'+app.session.s_index+'/'+tweet._source.id_str+"_"+i+'.'+ext+'"></a>'
+                        imgs += '<a href="'+app.imagesURL+app.session.s_index+'/'+tweet._source.id_str+"_"+i+'.'+ext+'" target="_blank"><img style="margin:2px;max-height:150px;width:auto;" src="'+app.imagesURL+app.session.s_index+'/'+tweet._source.id_str+"_"+i+'.'+ext+'"></a>'
               });
             }
             var state = tweet._source['session_'+app.session.s_name];
@@ -111,7 +112,7 @@ app.views.tweets = Backbone.View.extend({
                 defaultButtons: false,
                 onContentReady: function () {
                     var jc = this;
-                    $.post('http://localhost:2016/cluster_search_tweets', {cid: cid, index: app.session.s_index, word: word}, function(response){
+                    $.post(app.appURL+'cluster_search_tweets', {cid: cid, index: app.session.s_index, word: word}, function(response){
                         var html = self.get_tweets_html(response, 'static_tweet_box', cid);
                         self.delegateEvents();
                         jc.setContent(html);
@@ -142,7 +143,8 @@ app.views.tweets = Backbone.View.extend({
                 cbtn = '<a href="#" class="btn btn-primary btn-flat cluster_tweets" data-word="'+word+'" data-cid="'+cluster.key+'"><strong>Show tweets</strong></a>';
             }
             chtml += '<div class="card p-3 '+cbg+'">'+
-                '<img class="card-img-top" src="http://localhost/TwitterImages/'+app.session.s_index+'/'+cluster.image+'" alt="">'+
+                // '<img class="card-img-top" src="http://localhost/TwitterImages/'+app.session.s_index+'/'+cluster.image+'" alt="">'+
+                '<img class="card-img-top" src="'+app.imagesURL+app.session.s_index+'/'+cluster.image+'" alt="">'+
                 '<div class="card-body">'+
                     '<p class="card-text">'+cluster.doc_count+' related tweets contain this image</p>'+
                     '<p class="card-text">Cluster size: '+cluster.size+'</p>'+
@@ -167,7 +169,7 @@ app.views.tweets = Backbone.View.extend({
 		var tid = $(e.currentTarget).data("tid");
 		var val = $(e.currentTarget).data("val");
 		var el = $(e.currentTarget).closest('.media-body').find('.t_state');
-		$.post('http://localhost:2016/mark_tweet', {tid: tid, index: app.session.s_index, session: app.session.s_name, val: val}, function(response){
+		$.post(app.appURL+'mark_tweet', {tid: tid, index: app.session.s_index, session: app.session.s_name, val: val}, function(response){
 			var state = val;
 				if(state === "confirmed"){
 					state = '<span class="badge badge-success">'+state+'</span>';

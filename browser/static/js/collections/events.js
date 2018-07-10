@@ -11,13 +11,13 @@ app.collections.events = Backbone.Collection.extend({
         });
 
         var s_ev = res.toJSON();
-        $.post('http://localhost:2016/event_image', {obj: JSON.stringify(s_ev), index: app.session.s_index}, function(response){
+        $.post(app.appURL+'event_image', {obj: JSON.stringify(s_ev), index: app.session.s_index}, function(response){
             if(response.result){
                 var ext = "jpg";
                 if(response.image.extended_entities.media[0].media_url.endsWith("png")){
                     ext = "png";
                 }
-                res.set({image: 'http://localhost/TwitterImages/'+app.session.s_index+'/'+response.image.id_str+"_0"+'.'+ext});
+                res.set({image: app.imagesURL+app.session.s_index+'/'+response.image.id_str+"_0"+'.'+ext});
             }else{
                 res.set({image: "static/images/img.jpg"});
             }
@@ -35,13 +35,13 @@ app.collections.events = Backbone.Collection.extend({
             related_terms: value.related_terms
         });
         var s_ev = res.toJSON();
-        $.post('http://localhost:2016/event_image', {obj: JSON.stringify(s_ev), index: app.session.s_index}, function(response){
+        $.post(app.appURL+'event_image', {obj: JSON.stringify(s_ev), index: app.session.s_index}, function(response){
             if(response.result){
                 var ext = "jpg";
                 if(response.image.extended_entities.media[0].media_url.endsWith("png")){
                     ext = "png";
                 }
-                res.set({image: 'http://localhost/TwitterImages/'+app.session.s_index+'/'+response.image.id_str+"_0"+'.'+ext});
+                res.set({image: app.imagesURL+app.session.s_index+'/'+response.image.id_str+"_0"+'.'+ext});
             }else{
                 res.set({image: "static/images/img.jpg"});
             }

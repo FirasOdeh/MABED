@@ -9,10 +9,14 @@ var app = (function() {
 		session_id: null,
 		session: null,
 		eventsCollection: null,
+		imagesURL: 'http://localhost/TwitterImages/',
+		// appURL: 'http://localhost:5000/',
+		appURL: 'http://mediamining.univ-lyon2.fr:5000/',
 		init: function() {
 			this.content = $("#content");
 
 			this.eventsCollection = new app.collections.events();
+			this.imagesURL = 'http://mediamining.univ-lyon2.fr/~firas/TwitterImages/';
 
 			// if (localStorage.getItem('events') !== null) {
 			// 	var collectionString = localStorage.getItem('events');

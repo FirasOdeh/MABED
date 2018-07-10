@@ -21,7 +21,7 @@ app.views.settings = Backbone.View.extend({
     create_session: function(e){
       e.preventDefault();
       var self = this;
-      $.post('http://localhost:2016/add_session', $('#settings_form').serialize(), function(response){
+      $.post(app.appURL+'add_session', $('#settings_form').serialize(), function(response){
           console.log( response );
           self.all_sessions();
           self.all_sessions();
@@ -32,7 +32,7 @@ app.views.settings = Backbone.View.extend({
       e.preventDefault();
       var self = this;
       var id = $( "#sessionsList option:selected").attr('value');
-      $.post('http://localhost:2016/get_session',  $('#session_form').serialize(), function(response){
+      $.post(app.appURL+'get_session',  $('#session_form').serialize(), function(response){
           if(response.result==true){
             app.session_id = response.body._id;
             app.session = response.body._source;
@@ -67,7 +67,7 @@ app.views.settings = Backbone.View.extend({
     },
     all_sessions: function(){
       var self = this;
-      $.get('http://localhost:2016/sessions', null, function(response){
+      $.get(app.appURL+'sessions', null, function(response){
           var html = "";
           $.each(response, function(i, s){
             if(i==0&&app.session_id==null){
@@ -92,7 +92,7 @@ app.views.settings = Backbone.View.extend({
     deleteSession: function(e){
       e.preventDefault();
       var self = this;
-      $.post('http://localhost:2016/delete_session', {id: app.session_id}, function(response){
+      $.post(app.appURL+'delete_session', {id: app.session_id}, function(response){
           console.log( response );
           self.all_sessions();
           self.all_sessions();

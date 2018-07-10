@@ -65,7 +65,7 @@ app.views.mabed = Backbone.View.extend({
       data.push({name: "index", value: app.session.s_index});
       data.push({name: "session", value: app.session.s_name});
       console.log(data);
-      $.post('http://localhost:2016/detect_events', data, function(response){
+      $.post(app.appURL+'detect_events', data, function(response){
           console.log( response );
 
           $('#mabed_loading').fadeOut();
@@ -82,7 +82,7 @@ app.views.mabed = Backbone.View.extend({
               localStorage.removeItem('impact_data');
               localStorage.setItem('events', jsonCollection);
               localStorage.setItem('impact_data', impact_dataCollection);
-              $.post('http://localhost:2016/update_session_results', {index: app.session_id, events: jsonCollection, impact_data:impact_dataCollection}, function(res){
+              $.post(app.appURL+'update_session_results', {index: app.session_id, events: jsonCollection, impact_data:impact_dataCollection}, function(res){
                   console.log(res);
               });
           }else{
