@@ -65,9 +65,23 @@ app.views.mabed = Backbone.View.extend({
       data.push({name: "index", value: app.session.s_index});
       data.push({name: "session", value: app.session.s_name});
       console.log(data);
+      var jc = $.confirm({
+            theme: 'pix-default-modal',
+            title: 'Detecting Events',
+            boxWidth: '600px',
+            useBootstrap: false,
+            backgroundDismiss: false,
+            content: 'Please Don\'t close the page until you get the success message.<div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
+            defaultButtons: false,
+            buttons: {
+                cancel: {
+                    text: 'OK',
+                    btnClass: 'btn-cancel'
+                }
+            }
+        });
       $.post(app.appURL+'detect_events', data, function(response){
-          console.log( response );
-
+          // console.log( response );
           $('#mabed_loading').fadeOut();
           if(response.result){
               self.model.reset();
@@ -76,8 +90,7 @@ app.views.mabed = Backbone.View.extend({
               });
               var jsonCollection = JSON.stringify(self.model.toJSON());
               var impact_dataCollection = JSON.stringify(response.events.impact_data);
-              console.log("jsonCollection");
-              console.log(jsonCollection);
+              // console.log(jsonCollection);
               localStorage.removeItem('events');
               localStorage.removeItem('impact_data');
               localStorage.setItem('events', jsonCollection);
@@ -89,7 +102,23 @@ app.views.mabed = Backbone.View.extend({
               console.log("No result");
           }
 
-      }, 'json');
+      }, 'json').fail(function() {
+            $('#mabed_loading').fadeOut();
+            jc.close();
+            $.confirm({
+                title: 'Error',
+                boxWidth: '600px',
+                theme: 'pix-danger-modal',
+                backgroundDismiss: true,
+                content: "An error was encountered while connecting to the server, please try again.",
+                buttons: {
+                    cancel: {
+                        text: 'CANCEL',
+                        btnClass: 'btn-cancel',
+                    }
+                }
+            });
+        });
 
       return false;
     }

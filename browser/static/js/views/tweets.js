@@ -42,7 +42,22 @@ app.views.tweets = Backbone.View.extend({
       var self = this;
       $.post(app.appURL+'tweets', data, function(response){
         self.display_tweets(response, t0, data[0].value);
-      }, 'json');
+      }, 'json').fail(function() {
+          $('.loading_text').fadeOut('slow');
+            $.confirm({
+                title: 'Error',
+                boxWidth: '600px',
+                theme: 'pix-danger-modal',
+                backgroundDismiss: true,
+                content: "An error was encountered while connecting to the server, please try again.<br>Error code: tweets__tweets_submit",
+                buttons: {
+                    cancel: {
+                        text: 'CLOSE',
+                        btnClass: 'btn-cancel',
+                    }
+                }
+            });
+        });
 
       return false;
     },
@@ -93,6 +108,20 @@ app.views.tweets = Backbone.View.extend({
                           images: imgs,
                             state: state
                         });
+        }).fail(function() {
+            $.confirm({
+                title: 'Error',
+                boxWidth: '600px',
+                theme: 'pix-danger-modal',
+                backgroundDismiss: true,
+                content: "An error was encountered while connecting to the server, please try again.<br>Error code: tweets__get_tweets_html",
+                buttons: {
+                    cancel: {
+                        text: 'CLOSE',
+                        btnClass: 'btn-cancel',
+                    }
+                }
+            });
         });
         return html;
     },
@@ -116,7 +145,21 @@ app.views.tweets = Backbone.View.extend({
                         var html = self.get_tweets_html(response, 'static_tweet_box', cid);
                         self.delegateEvents();
                         jc.setContent(html);
-                }, 'json');
+                }, 'json').fail(function() {
+                        $.confirm({
+                            title: 'Error',
+                            boxWidth: '600px',
+                            theme: 'pix-danger-modal',
+                            backgroundDismiss: true,
+                            content: "An error was encountered while connecting to the server, please try again.<br>Error code: tweets__cluster_tweets",
+                            buttons: {
+                                cancel: {
+                                    text: 'CLOSE',
+                                    btnClass: 'btn-cancel',
+                                }
+                            }
+                        });
+                    });
                 },
                 buttons: {
                     cancel: {
@@ -179,7 +222,21 @@ app.views.tweets = Backbone.View.extend({
 					state = '<span class="badge badge-secondary">'+state+'</span>';
 				}
 				el.html(state);
-		}, 'json');
+		}, 'json').fail(function() {
+                        $.confirm({
+                            title: 'Error',
+                            boxWidth: '600px',
+                            theme: 'pix-danger-modal',
+                            backgroundDismiss: true,
+                            content: "An error was encountered while connecting to the server, please try again.<br>Error code: tweets__tweet_state",
+                            buttons: {
+                                cancel: {
+                                    text: 'CLOSE',
+                                    btnClass: 'btn-cancel',
+                                }
+                            }
+                        });
+                    });
 		return false;
 	}
 });

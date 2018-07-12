@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     # my_connector = Es_connector(index="twitter2016")
     # my_connector = Es_connector(index=args.i)
-    my_connector = Es_connector(index=args.i, host='localhost', user='', password='')
+    my_connector = Es_connector(index=args.i, host='http://206.189.211.142', user='', password='')
     imgs = 0
     count = 0
     c_count = 0
