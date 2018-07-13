@@ -11,13 +11,18 @@ from flask import jsonify
 from flask_cors import CORS, cross_origin
 from flask_frozen import Freezer
 from flask import Response
+from flask_htpasswd import HtPasswdAuth
 
 
 # mabed
 from mabed.functions import Functions
 
 app = Flask(__name__, static_folder='browser/static', template_folder='browser/templates')
+app.config['FLASK_HTPASSWD_PATH'] = '.htpasswd'
+app.config['FLASK_SECRET'] = 'Hey Hey Kids, secure me!'
 
+
+htpasswd = HtPasswdAuth(app)
 
 
 # ==================================================================
@@ -25,8 +30,8 @@ app = Flask(__name__, static_folder='browser/static', template_folder='browser/t
 # ==================================================================
 
 # Enable CORS
-cors = CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
+# cors = CORS(app)
+# app.config['CORS_HEADERS'] = 'Content-Type'
 
 # Disable Cache
 @app.after_request
@@ -40,7 +45,7 @@ def add_header(r):
 
 # Settings Form submit
 @app.route('/settings', methods=['POST'])
-@cross_origin()
+# @cross_origin()
 def settings():
     data = request.form
     print(data)
@@ -85,7 +90,7 @@ def event_descriptions():
 
 # Run MABED
 @app.route('/detect_events', methods=['POST', 'GET'])
-@cross_origin()
+# @cross_origin()
 def detect_events():
     data = request.form
     print(data)
@@ -140,7 +145,7 @@ def images():
 
 # Get Tweets
 @app.route('/tweets', methods=['POST'])
-@cross_origin()
+# @cross_origin()
 def tweets():
     data = request.form
     print(data['word'])
@@ -152,7 +157,7 @@ def tweets():
 
 
 @app.route('/tweets_scroll', methods=['POST'])
-@cross_origin()
+# @cross_origin()
 def tweets_scroll():
     data = request.form
     tweets= functions.get_tweets_scroll(index=data['index'], sid=data['sid'], scroll_size=int(data['scroll_size']))
@@ -161,7 +166,7 @@ def tweets_scroll():
 
 # Get Event related tweets
 @app.route('/event_tweets', methods=['POST'])
-@cross_origin()
+# @cross_origin()
 def event_tweets():
     data = request.form
     index = data['index']
@@ -178,7 +183,7 @@ def event_tweets():
 
 # Get Image Cluster tweets
 @app.route('/cluster_tweets', methods=['POST', 'GET'])
-@cross_origin()
+# @cross_origin()
 def cluster_tweets():
     data = request.form
     index = data['index']
@@ -197,7 +202,7 @@ def cluster_tweets():
 
 # Get Search Image Cluster tweets
 @app.route('/cluster_search_tweets', methods=['POST', 'GET'])
-@cross_origin()
+# @cross_origin()
 def cluster_search_tweets():
     data = request.form
     index = data['index']
@@ -211,7 +216,7 @@ def cluster_search_tweets():
 
 # Get Event main image
 @app.route('/event_image', methods=['POST'])
-@cross_origin()
+# @cross_origin()
 def event_image():
     data = request.form
     index = data['index']
@@ -226,18 +231,10 @@ def event_image():
         res = True
     return jsonify({"result":res, "image": image})
 
-# TODO mark as valid
-# TODO mark as negative
-# TODO mark as proposed
-#   - All tweets (Testing & rest)
-#   - Event related (inside Timeline)
-#   - User (Tweet Option)
-#   - Keyword (Search page)
-#   - Cluster (Cluster card options)
 
 # Test & Debug
 @app.route('/mark_valid', methods=['POST', 'GET'])
-@cross_origin()
+# @cross_origin()
 def mark_valid():
     data = request.form
     print(data)
@@ -247,7 +244,7 @@ def mark_valid():
 
 
 @app.route('/mark_event', methods=['POST', 'GET'])
-@cross_origin()
+# @cross_origin()
 def mark_event():
     data = request.form
     print(data)
@@ -257,7 +254,7 @@ def mark_event():
     return jsonify(data)
 
 @app.route('/mark_cluster', methods=['POST', 'GET'])
-@cross_origin()
+# @cross_origin()
 def mark_cluster():
     data = request.form
     print(data)
@@ -269,7 +266,7 @@ def mark_cluster():
     return jsonify(res)
 
 @app.route('/mark_tweet', methods=['POST', 'GET'])
-@cross_origin()
+# @cross_origin()
 def mark_tweet():
     data = request.form
     print(data)
@@ -282,7 +279,7 @@ def mark_tweet():
 
 
 @app.route('/delete_field', methods=['POST', 'GET'])
-@cross_origin()
+# @cross_origin()
 def delete_field():
     up1 = functions.update_all("twitter2017", "tweet", "imagesCluster", "")
     # up = functions.delete_session("s1")
@@ -294,7 +291,7 @@ def delete_field():
 # ==================================================================
 
 @app.route('/export_events', methods=['POST', 'GET'])
-@cross_origin()
+# @cross_origin()
 def export_events():
     # data = request.form
     # session = data['session_id']
@@ -316,12 +313,14 @@ def export_events():
     #     headers={'Content-Disposition': 'attachment;filename=events.json'})
 
 @app.route('/export_tweets', methods=['POST', 'GET'])
-@cross_origin()
+# @cross_origin()
 def export_tweets():
+    session = request.args.get('session')
+
     # data = request.form
     # session = data['session_id']
     # res = functions.get_session(session)
-    res = functions.get_session('6n7aD2QBU2R9ngE9d8IB')
+    res = functions.get_session(session)
     index = res['_source']['s_index']
     events = json.loads(res['_source']['events'])
     for event in events:
@@ -332,10 +331,30 @@ def export_tweets():
         # tweets = tweets['hits']['hits']
         event['tweets'] = 'tweets'
 
-    return jsonify(events)
+    return jsonify(session)
     # return Response(str(events),
     #     mimetype='application/json',
     #     headers={'Content-Disposition': 'attachment;filename=events.json'})
+
+
+@app.route('/export_confirmed_tweets', methods=['POST', 'GET'])
+# @cross_origin()
+def export_confirmed_tweets():
+    session = request.args.get('session')
+
+    # data = request.form
+    # session = data['session_id']
+    # res = functions.get_session(session)
+    res = functions.get_session(session)
+    index = res['_source']['s_index']
+    s_name = res['_source']['s_name']
+    tweets = functions.export_event(index,s_name)
+
+
+    # return jsonify("tweets")
+    return Response(str(tweets),
+                mimetype='application/json',
+                headers={'Content-Disposition':'attachment;filename='+s_name+'tweets.json'})
 
 # ==================================================================
 # 6. Sessions
@@ -343,7 +362,7 @@ def export_tweets():
 
 # Get Sessions
 @app.route('/sessions', methods=['POST', 'GET'])
-@cross_origin()
+# @cross_origin()
 def sessions():
     data = request.form
     print(data)
@@ -355,7 +374,7 @@ def sessions():
 
 # Add new Session
 @app.route('/add_session', methods=['POST'])
-@cross_origin()
+# @cross_origin()
 def add_session():
     data = request.form
     name = data['s_name']
@@ -370,7 +389,7 @@ def add_session():
 
 # Delete Session
 @app.route('/delete_session', methods=['POST'])
-@cross_origin()
+# @cross_origin()
 def delete_session():
     data = request.form
     id = data['id']
@@ -381,7 +400,7 @@ def delete_session():
 
 # Get Session
 @app.route('/get_session', methods=['POST'])
-@cross_origin()
+# @cross_origin()
 def get_session():
     data = request.form
     id = data['id']
@@ -395,7 +414,7 @@ def get_session():
 
 # Update session results
 @app.route('/update_session_results', methods=['POST'])
-@cross_origin()
+# @cross_origin()
 def update_session_results():
     data = request.form
     events = data['events']
@@ -411,7 +430,7 @@ def update_session_results():
 
 # Get session results
 @app.route('/get_session_results', methods=['POST', 'GET'])
-@cross_origin()
+# @cross_origin()
 def get_session_results():
     data = request.form
     index = data['index']
@@ -427,7 +446,8 @@ def get_session_results():
 # 6. Main
 # ==================================================================
 @app.route('/')
-def ind():
+@htpasswd.required
+def index(user):
     return render_template('index.html')
 
 

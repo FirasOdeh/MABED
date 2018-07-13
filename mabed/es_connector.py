@@ -9,8 +9,8 @@ __email__ = "odehfiras@gmail.com"
 class Es_connector:
 
     # def __init__(self, host='http://206.189.211.142', port=9200, user='', password='', timeout=1000, index="test2", doc_type="tweet"):
-    # def __init__(self, host='localhost', port=9200, user='elastic', password='elastic', timeout=1000, index="test2", doc_type="tweet"):
-    def __init__(self, host='localhost', port=9200, user='', password='', timeout=1000, index="test2", doc_type="tweet"):
+    def __init__(self, host='localhost', port=9200, user='elastic', password='elastic', timeout=1000, index="test2", doc_type="tweet"):
+    # def __init__(self, host='localhost', port=9200, user='', password='', timeout=1000, index="test2", doc_type="tweet"):
 
         # Define config
         self.host = host

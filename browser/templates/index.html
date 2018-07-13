@@ -175,7 +175,12 @@
               </div>
               <div class="form-group">
                 <label for="session_name">Session Index</label>
-                <input name="s_index" type="text" class="form-control" id="session_index" placeholder="Enter Session Index">
+{#                <input name="s_index" type="text" class="form-control" id="session_index" placeholder="Enter Session Index">#}
+                  <select name="s_index" class="custom-select" id="session_index">
+                      <option value="twitter2015">Twitter2015</option>
+                      <option value="twitter2016">Twitter2016</option>
+                      <option value="twitter2017" selected>Twitter2017</option>
+                </select>
               </div>
 
               <div class="pix-margin-v-30">
@@ -427,8 +432,8 @@
 {#            </table>#}
 {#          </div>#}
             <div class="col-12 pix-padding-bottom-20">
-                <a href="#" class="btn btn-lg btn-flat btn-success" ><strong>Export events .json File</strong></a>
-                <a href="#" class="btn btn-lg btn-flat btn-success" ><strong>Export tweets .json File</strong></a>
+{#                <a href="#" class="btn btn-lg btn-flat btn-success" ><strong>Export events .json File</strong></a>#}
+                <a href="#" class="btn btn-lg btn-flat btn-success export_tweets" ><strong>Export confirmed tweets .json File</strong></a>
           </div>
             <div class="col-12 pix-padding-bottom-20">
                 <hr>

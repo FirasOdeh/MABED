@@ -766,5 +766,17 @@ class Functions:
         return res
 
 
-    def export_event(self):
-        return "events"
+    def export_event(self, index, session):
+        my_connector = Es_connector(index=index)
+        res = my_connector.bigSearch(
+            {
+                "_source": {
+                    "excludes": ["session_*"]
+                },
+                "query": {
+                    "term": {
+                        "session_"+session: "confirmed"
+                    }
+                }
+            })
+        return res
