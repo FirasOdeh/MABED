@@ -181,6 +181,13 @@ def event_tweets():
     return jsonify({"tweets": tweets, "clusters": clusters})
 
 
+@app.route('/tweets_state', methods=['POST'])
+# @cross_origin()
+def tweets_state():
+    data = request.form
+    tweets= functions.get_tweets_state(index=data['index'], session=data['session'], state=data['state'])
+    return jsonify({"tweets": tweets})
+
 # Get Image Cluster tweets
 @app.route('/cluster_tweets', methods=['POST', 'GET'])
 # @cross_origin()
@@ -453,4 +460,5 @@ def index(user):
 
 if __name__ == '__main__':
     functions = Functions()
+    # app.run(debug=True, host='localhost', port=5000, threaded=True)
     app.run(debug=True, host='mediamining.univ-lyon2.fr', port=5000, threaded=True)

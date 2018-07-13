@@ -91,6 +91,7 @@ app.views.settings = Backbone.View.extend({
             console.log("sesssss");
             console.log(response);
             if(response.body._source.events){
+                app.eventsCollection.reset();
               var collection = JSON.parse(response.body._source.events);
               console.log(collection);
               app.eventsCollection.add_json_events(collection);

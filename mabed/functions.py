@@ -226,6 +226,19 @@ class Functions:
             })
         return res
 
+
+    def get_tweets_state(self, index="test3", session="",state="proposed"):
+        my_connector = Es_connector(index=index)
+        res = my_connector.init_paginatedSearch(
+            {
+                "query": {
+                    "term": {
+                        "session_"+session: state
+                    }
+                }
+            })
+        return res
+
     def get_big_tweets_scroll(self, index="test3", word=""):
         my_connector = Es_connector(index=index)
         res = my_connector.init_paginatedSearch(

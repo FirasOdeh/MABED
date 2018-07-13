@@ -6,7 +6,8 @@ app.views.client = Backbone.View.extend({
 				'click .tl_options_btn': 'mark_event',
 				'click .cluster_tweets': 'cluster_tweets',
 				'click .tweet_state': 'tweet_state',
-        		'click .scroll_tweets': 'scroll_tweets'
+        		'click .scroll_tweets': 'scroll_tweets',
+				'click .cluster_state': 'cluster_state'
 		},
 	  initialize: function() {
 	      this.render();
@@ -20,6 +21,7 @@ app.views.client = Backbone.View.extend({
 	    var html = this.template({});
 	  	this.$el.html(html);
 	  	this.delegateEvents();
+	  	$('#timeline_div').html('<div id="timeline-embed" style="width: 100%; height: 800px;box-shadow: 0 4px 2px -2px rgba(0,0,0,0.2)"></div>');
 		this.load_timeline();
 		this.load_impact();
 	  	return this;
@@ -119,7 +121,24 @@ app.views.client = Backbone.View.extend({
 			data.push({name: "event", value: s_ev});
 			data.push({name: "status", value: $(e.currentTarget).data("status")});
 
+			 var jc = $.confirm({
+				theme: 'pix-default-modal',
+				title: 'Changing tweets state',
+				boxWidth: '600px',
+				useBootstrap: false,
+				backgroundDismiss: false,
+				content: 'Please Don\'t close the page.<div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
+				defaultButtons: false,
+				buttons: {
+					cancel: {
+						text: 'OK',
+						btnClass: 'btn-cancel'
+					}
+				}
+			});
+
 			$.post(app.appURL+'mark_event', data, function(response){
+				jc.close();
 						console.log(response);
 			}, 'json');
 			return false;
@@ -217,7 +236,7 @@ app.views.client = Backbone.View.extend({
 			var i = 0;
 			if(response.clusters) {
                 $.each(response.clusters, function (i, cluster) {
-                    if (i >= 20) {
+                    if (i >= 30) {
                         return false;
                     }
                     i++;
@@ -228,8 +247,8 @@ app.views.client = Backbone.View.extend({
                     if (eid) {
                         cbtn = '<a href="#" class="btn btn-primary btn-flat cluster_tweets" data-eid="' + eid + '" data-cid="' + cluster.key + '"><strong>Show tweets</strong></a>';
                         state_btns = '<div class="cluster_state_btns">';
-                        state_btns += '<a href="#" class="btn btn-outline-success" data-eid="' + eid + '" data-cid="' + cluster.key + '"><strong>Confirmed</strong></a>';
-                        state_btns += ' <a href="#" class="btn btn-outline-danger" data-eid="' + eid + '" data-cid="' + cluster.key + '"><strong>Negative</strong></a>';
+                        state_btns += '<a href="#" class="btn btn-outline-success cluster_state" data-state="confirmed" data-cid="' + cluster.key + '"><strong>Confirmed</strong></a>';
+                        state_btns += ' <a href="#" class="btn btn-outline-danger cluster_state" data-state="negative" data-cid="' + cluster.key + '"><strong>Negative</strong></a>';
                         state_btns += '</div>';
                     }
                     chtml += '<div class="card p-3 ' + cbg + '">' +
@@ -309,5 +328,17 @@ app.views.client = Backbone.View.extend({
                 });
             });
         return false;
-    }
+    },
+	cluster_state: function(e){
+    	e.preventDefault();
+    	var state = $(e.currentTarget).data("state");
+    	var cid = $(e.currentTarget).data("cid");
+    	var data = [];
+		data.push({name: "index", value: app.session.s_index});
+		data.push({name: "session", value: app.session.s_name});
+		data.push({name: "state", value: state});
+		data.push({name: "cid", value: cid});
+    	// alert(state);
+    	return false;
+	}
 });

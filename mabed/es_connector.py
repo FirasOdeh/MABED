@@ -8,7 +8,6 @@ __email__ = "odehfiras@gmail.com"
 
 class Es_connector:
 
-    # def __init__(self, host='http://206.189.211.142', port=9200, user='', password='', timeout=1000, index="test2", doc_type="tweet"):
     # def __init__(self, host='localhost', port=9200, user='elastic', password='elastic', timeout=1000, index="test2", doc_type="tweet"):
     def __init__(self, host='localhost', port=9200, user='', password='', timeout=1000, index="test2", doc_type="tweet"):
 
@@ -403,12 +402,12 @@ class Es_connector:
             for item in hits:
                 item['_source'].pop(field, None)
                 up = self.update(item['_id'], {"script" : "ctx._source.remove(\""+field+"\")"})
-                print(item['_id'])
-                print(up)
+                # print(item['_id'])
+                # print(up)
 
         # Check index exists
         if not self.es.indices.exists(index=self.index):
-            print("Index " + self.index + " not exists")
+            # print("Index " + self.index + " not exists")
             return False
 
         # Init scroll by search
@@ -425,7 +424,7 @@ class Es_connector:
         scroll_size = len(data['hits']['hits'])
 
         # Before scroll, process current batch of hits
-        print(data['hits']['total'])
+        # print(data['hits']['total'])
         process_hits(data['hits']['hits'])
 
         while scroll_size > 0:

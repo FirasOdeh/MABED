@@ -146,13 +146,24 @@ var app = (function() {
             view.render();
         },
 				mabed: function() {
-            var view = ViewsFactory.mabed();
+			if(api.session_id){
+				var view = ViewsFactory.mabed();
+							$('#mabed-nav .nav-item').removeClass('active');
+							$('#nav-mabed').addClass('active');
+				api
+					.title("Run")
+					.changeContent(view.$el);
+				view.render();
+			}else{
+				 var view = ViewsFactory.settings();
 						$('#mabed-nav .nav-item').removeClass('active');
-						$('#nav-mabed').addClass('active');
+						$('#nav-settings').addClass('active');
             api
-                .title("Run")
+                .title("Settings")
                 .changeContent(view.$el);
             view.render();
+			}
+
         },
 				results: function(archive) {
             var view = ViewsFactory.client();

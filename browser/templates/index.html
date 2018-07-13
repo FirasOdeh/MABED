@@ -86,7 +86,7 @@
                 <i class="pixicon-play"></i>
                 <strong class="">Start</strong>
               </a>
-              <a href="#tweets" class="btn btn-lg btn-line btn-round-lg pix-white-line fly">
+              <a href="#tweets" class="btn btn-lg btn-line pix-white-line fly">
                 <i class="pixicon-document"></i>
                 <strong>Search Tweets</strong>
               </a>
@@ -123,7 +123,10 @@
   </script>
 
   <script type="text/template" id="tpl-page-2">
-    <br><div id='timeline-embed' style="width: 100%; height: 800px;box-shadow: 0 4px 2px -2px rgba(0,0,0,0.2)"></div>
+    <br>
+    <div id="timeline_div">
+
+    </div>
     <div class="gray-bg bg-lighten-4 pix-padding-v-65">
       <div class="container">
         <div class="row">
@@ -431,19 +434,31 @@
 {#              </tbody>#}
 {#            </table>#}
 {#          </div>#}
-            <div class="col-12 pix-padding-bottom-20">
+            <div class="col-12 pix-padding-bottom-60">
 {#                <a href="#" class="btn btn-lg btn-flat btn-success" ><strong>Export events .json File</strong></a>#}
                 <a href="#" class="btn btn-lg btn-flat btn-success export_tweets" ><strong>Export confirmed tweets .json File</strong></a>
           </div>
-            <div class="col-12 pix-padding-bottom-20">
-                <hr>
+
+            </div>
           </div>
-            <div class="col-12 pix-margin-bottom-30">
-            <h2 class="pix-gray darken-4 font-black">Review</h2>
+            <div class="gray-bg bg-lighten-4 pix-padding-v-65">
+                <div class="container">
+        <div class="row">
+                <div class="col-12 pix-margin-bottom-30">
+                <h2 class="pix-gray darken-4 font-black">Review</h2>
+              </div>
+                <div class="col-12 pix-padding-bottom-30">
+                    <a class="btn btn-lg btn-success pix-white fly shadow scale btn_review" data-state="confirmed" href="#" role="button"><strong>Confirmed</strong></a>
+                    <a class="btn btn-lg btn-danger pix-white fly shadow scale btn_review" data-state="negative" href="#" role="button"><strong>Negative</strong></a>
+                    <a class="btn btn-lg btn-primary pix-white fly shadow scale btn_review" data-state="proposed" href="#" role="button"><strong>Proposed</strong></a>
+              </div>
+            <div class="col-12" id="tweets_results">
+            <span id="res_num">0</span> results (<span id="res_time">0.1</span> seconds)
           </div>
-            <div class="col-12 pix-padding-bottom-30">
-                Tweets
-          </div>
+                <div class="col-12" id="tweets_result">
+              </div>
+                </div>
+
             </div>
           </div>
           </div>
