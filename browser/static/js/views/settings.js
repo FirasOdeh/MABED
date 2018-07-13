@@ -23,7 +23,7 @@ app.views.settings = Backbone.View.extend({
       var self = this;
       var jc = $.confirm({
             theme: 'pix-default-modal',
-            title: 'Create Session',
+            title: 'Creating Session',
             boxWidth: '600px',
             useBootstrap: false,
             backgroundDismiss: false,
@@ -41,7 +41,38 @@ app.views.settings = Backbone.View.extend({
           jc.close();
           self.all_sessions();
           self.all_sessions();
-      }, 'json');
+          $.confirm({
+                theme: 'pix-default-modal',
+                title: 'Success',
+                boxWidth: '600px',
+                type: 'green',
+                useBootstrap: false,
+                backgroundDismiss: false,
+                content: 'The session was successfully created, you can start event detection!',
+                defaultButtons: false,
+                buttons: {
+                    cancel: {
+                        text: 'OK',
+                        btnClass: 'btn-cancel'
+                    }
+                }
+            });
+      }, 'json').fail(function() {
+            jc.close();
+            $.confirm({
+                title: 'Error',
+                boxWidth: '600px',
+                theme: 'pix-danger-modal',
+                backgroundDismiss: true,
+                content: "An error was encountered while connecting to the server, please try again.",
+                buttons: {
+                    cancel: {
+                        text: 'CANCEL',
+                        btnClass: 'btn-cancel'
+                    }
+                }
+            });
+        });
       return false;
     },
     switchSession: function(e){
@@ -110,7 +141,7 @@ app.views.settings = Backbone.View.extend({
       var self = this;
       var jc = $.confirm({
             theme: 'pix-default-modal',
-            title: 'Delete Session',
+            title: 'Deleting Session',
             boxWidth: '600px',
             useBootstrap: false,
             backgroundDismiss: false,
