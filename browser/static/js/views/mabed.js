@@ -2,32 +2,6 @@ app.views.mabed = Backbone.View.extend({
     template: _.template($("#tpl-page-mabed").html()),
     events: {
         'submit #run_mabed': 'run_mabed',
-        'click body': 'test'
-    },
-    test: function(){
-        alert("test");
-       $.confirm({
-            title: 'Export as .Zip file',
-            boxWidth: '600px',
-            useBootstrap: false,
-            theme: 'pix-default-modal',
-            backgroundDismiss: true,
-            content: 'Don\'t forget to save the project before exporting it.',
-            buttons: {
-                cancel: {
-                    text: 'CANCEL',
-                    btnClass: 'btn-cancel',
-                },
-                publish: {
-                    text: 'GO TO EXPORT PAGE',
-                    btnClass: 'btn-blue',
-                    keys: ['enter', 'shift'],
-                    action: function(){
-                        window.open('export',"_blank");
-                    }
-                }
-            }
-        });
     },
     initialize: function() {
         // this.render();
@@ -87,7 +61,7 @@ app.views.mabed = Backbone.View.extend({
             boxWidth: '600px',
             useBootstrap: false,
             backgroundDismiss: false,
-            content: 'Please Don\'t close the page until you get the success message.<div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
+            content: 'Please Don\'t close the page until you get the success message.<br>This may take several minutes.<div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
             defaultButtons: false,
             buttons: {
                 cancel: {
@@ -99,6 +73,7 @@ app.views.mabed = Backbone.View.extend({
       $.post(app.appURL+'detect_events', data, function(response){
           // console.log( response );
           $('#mabed_loading').fadeOut();
+          jc.close();
           if(response.result){
               self.model.reset();
               $.each(response.events.event_descriptions, function( i, value ) {

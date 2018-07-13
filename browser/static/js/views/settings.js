@@ -21,8 +21,24 @@ app.views.settings = Backbone.View.extend({
     create_session: function(e){
       e.preventDefault();
       var self = this;
+      var jc = $.confirm({
+            theme: 'pix-default-modal',
+            title: 'Create Session',
+            boxWidth: '600px',
+            useBootstrap: false,
+            backgroundDismiss: false,
+            content: 'Please Don\'t close the page until you get the success message.<br>This may take several minutes.<div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
+            defaultButtons: false,
+            buttons: {
+                cancel: {
+                    text: 'OK',
+                    btnClass: 'btn-cancel'
+                }
+            }
+        });
       $.post(app.appURL+'add_session', $('#settings_form').serialize(), function(response){
           console.log( response );
+          jc.close();
           self.all_sessions();
           self.all_sessions();
       }, 'json');
@@ -92,8 +108,24 @@ app.views.settings = Backbone.View.extend({
     deleteSession: function(e){
       e.preventDefault();
       var self = this;
+      var jc = $.confirm({
+            theme: 'pix-default-modal',
+            title: 'Delete Session',
+            boxWidth: '600px',
+            useBootstrap: false,
+            backgroundDismiss: false,
+            content: 'Please Don\'t close the page until you get the success message.<br>This may take several minutes.<div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
+            defaultButtons: false,
+            buttons: {
+                cancel: {
+                    text: 'OK',
+                    btnClass: 'btn-cancel'
+                }
+            }
+        });
       $.post(app.appURL+'delete_session', {id: app.session_id}, function(response){
           console.log( response );
+          jc.close();
           self.all_sessions();
           self.all_sessions();
           app.session_id = null;
