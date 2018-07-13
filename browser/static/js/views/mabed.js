@@ -58,6 +58,22 @@ app.views.mabed = Backbone.View.extend({
     run_mabed: function(e){
       e.preventDefault();
       // localStorage.removeItem('events');
+        if(!app.session){
+          $.confirm({
+                title: 'Error',
+                boxWidth: '800px',
+                theme: 'pix-danger-modal',
+                backgroundDismiss: true,
+                content: "Error! please select a session from the settings page.",
+                buttons: {
+                    cancel: {
+                        text: 'CLOSE',
+                        btnClass: 'btn-cancel',
+                    }
+                }
+            });
+          return false;
+      }
       console.log("Running MABED...");
       $('#mabed_loading').fadeIn('slow');
       var self = this;

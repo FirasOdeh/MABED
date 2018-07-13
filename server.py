@@ -151,6 +151,14 @@ def tweets():
     return jsonify({"tweets": tweets, "clusters": clusters})
 
 
+@app.route('/tweets_scroll', methods=['POST'])
+@cross_origin()
+def tweets_scroll():
+    data = request.form
+    tweets= functions.get_tweets_scroll(index=data['index'], sid=data['sid'], scroll_size=int(data['scroll_size']))
+    return jsonify({"tweets": tweets})
+
+
 # Get Event related tweets
 @app.route('/event_tweets', methods=['POST'])
 @cross_origin()
@@ -161,10 +169,10 @@ def event_tweets():
     event = json.loads(data['obj'])
     main_term = event['main_term'].replace(",", " ")
     related_terms = event['related_terms']
-    res = functions.get_event_tweets(index, main_term, related_terms)
-    tweets = res['hits']['hits']
+    tweets = functions.get_event_tweets(index, main_term, related_terms)
+    # tweets = tweets['hits']['hits']
     clusters = functions.get_event_clusters(index, main_term, related_terms)
-    print(clusters )
+    # print(clusters )
     return jsonify({"tweets": tweets, "clusters": clusters})
 
 
@@ -184,6 +192,7 @@ def cluster_tweets():
     # event_tweets = 0
     res = functions.get_cluster_tweets(index, cid)
     tweets = res['hits']['hits']
+    tweets = {"results":tweets}
     return jsonify({"tweets": tweets, "event_tweets": event_tweets})
 
 # Get Search Image Cluster tweets
@@ -197,6 +206,7 @@ def cluster_search_tweets():
     search_tweets = functions.get_big_tweets(index=index, word=word)
     res = functions.get_cluster_tweets(index, cid)
     tweets = res['hits']['hits']
+    tweets = {"results": tweets}
     return jsonify({"tweets": tweets, "search_tweets": search_tweets})
 
 # Get Event main image

@@ -3,7 +3,8 @@ app.views.tweets = Backbone.View.extend({
     events: {
         'submit #tweets_form': 'tweets_submit',
         'click .tweet_state': 'tweet_state',
-        'click .cluster_tweets': 'cluster_tweets'
+        'click .cluster_tweets': 'cluster_tweets',
+        'click .scroll_tweets': 'scroll_tweets'
     },
     initialize: function() {
         this.render();
@@ -34,6 +35,22 @@ app.views.tweets = Backbone.View.extend({
     },
     tweets_submit: function(e){
       e.preventDefault();
+      if(!app.session){
+          $.confirm({
+                title: 'Error',
+                boxWidth: '800px',
+                theme: 'pix-danger-modal',
+                backgroundDismiss: true,
+                content: "Error! please select a session from the settings page.",
+                buttons: {
+                    cancel: {
+                        text: 'CLOSE',
+                        btnClass: 'btn-cancel',
+                    }
+                }
+            });
+          return false;
+      }
       $('#tweets_results').fadeOut('slow');
       $('.loading_text').fadeIn('slow');
       var t0 = performance.now();
@@ -64,7 +81,7 @@ app.views.tweets = Backbone.View.extend({
     get_tweets_html: function(response, classes, cid){
         var html = "";
         var template = _.template($("#tpl-item-tweet").html());
-        $.each(response.tweets, function(i, tweet){
+        $.each(response.tweets.results, function(i, tweet){
             var imgs = "";
             var t_classes = classes;
             if(response.search_tweets){
@@ -108,21 +125,10 @@ app.views.tweets = Backbone.View.extend({
                           images: imgs,
                             state: state
                         });
-        }).fail(function() {
-            $.confirm({
-                title: 'Error',
-                boxWidth: '600px',
-                theme: 'pix-danger-modal',
-                backgroundDismiss: true,
-                content: "An error was encountered while connecting to the server, please try again.<br>Error code: tweets__get_tweets_html",
-                buttons: {
-                    cancel: {
-                        text: 'CLOSE',
-                        btnClass: 'btn-cancel',
-                    }
-                }
-            });
         });
+        if(response.tweets.scroll_size>0){
+            html += '<div class="pix-margin-top-10"><a href="#" class="btn btn-lg btn-outline-success full_width scroll_tweets" data-scroll="'+response.tweets.scroll_size+'" data-sid="'+response.tweets.sid+'"> <strong>Load more tweets</strong> </a></div>';
+        }
         return html;
     },
     cluster_tweets: function(e){
@@ -176,35 +182,38 @@ app.views.tweets = Backbone.View.extend({
         var html = this.get_tweets_html(response, '');
         var chtml = "";
         var cbtn = "";
-        $.each(response.clusters, function(i, cluster){
-            if(i>=20){return false;}
-            var cbg = "";
-            if(parseInt(cluster.size)>parseInt(cluster.doc_count)){
-                cbg = 'yellow-tweet';
-            }
-            if(word){
-                cbtn = '<a href="#" class="btn btn-primary btn-flat cluster_tweets" data-word="'+word+'" data-cid="'+cluster.key+'"><strong>Show tweets</strong></a>';
-            }
-            chtml += '<div class="card p-3 '+cbg+'">'+
-                // '<img class="card-img-top" src="http://localhost/TwitterImages/'+app.session.s_index+'/'+cluster.image+'" alt="">'+
-                '<img class="card-img-top" src="'+app.imagesURL+app.session.s_index+'/'+cluster.image+'" alt="">'+
-                '<div class="card-body">'+
-                    '<p class="card-text">'+cluster.doc_count+' related tweets contain this image</p>'+
-                    '<p class="card-text">Cluster size: '+cluster.size+'</p>'+
-                    '<p class="card-text">Cluster ID: '+cluster.key+'</p>'+
-                    cbtn+
-                '</div>'+
-            '</div>';
-        });
+        if(response.clusters){
+            $.each(response.clusters, function(i, cluster){
+                if(i>=20){return false;}
+                var cbg = "";
+                if(parseInt(cluster.size)>parseInt(cluster.doc_count)){
+                    cbg = 'yellow-tweet';
+                }
+                if(word){
+                    cbtn = '<a href="#" class="btn btn-primary btn-flat cluster_tweets" data-word="'+word+'" data-cid="'+cluster.key+'"><strong>Show tweets</strong></a>';
+                }
+                chtml += '<div class="card p-3 '+cbg+'">'+
+                    '<img class="card-img-top" src="'+app.imagesURL+app.session.s_index+'/'+cluster.image+'" alt="">'+
+                    '<div class="card-body">'+
+                        '<p class="card-text">'+cluster.doc_count+' related tweets contain this image</p>'+
+                        '<p class="card-text">Cluster size: '+cluster.size+'</p>'+
+                        '<p class="card-text">Cluster ID: '+cluster.key+'</p>'+
+                        cbtn+
+                    '</div>'+
+                '</div>';
+            });
+            $('#imagesClusters').html(chtml);
+        }
         $('#tweets_result').html(html);
-        $('#imagesClusters').html(chtml);
         $('.loading_text').fadeOut('slow');
         $('#tweets_results').fadeIn('slow');
-        var t1 = performance.now();
-        var time = (t1 - t0) / 1000;
-        var roundedString = time.toFixed(2);
-        $('#res_num').html(response.tweets.length);
-        $('#res_time').html(roundedString);
+        if(t0){
+            var t1 = performance.now();
+            var time = (t1 - t0) / 1000;
+            var roundedString = time.toFixed(2);
+            $('#res_num').html(response.tweets.total);
+            $('#res_time').html(roundedString);
+        }
 
     },
     tweet_state: function(e){
@@ -238,5 +247,36 @@ app.views.tweets = Backbone.View.extend({
                         });
                     });
 		return false;
-	}
+	},
+    scroll_tweets: function(e){
+        e.preventDefault();
+        var scroll_size = $(e.currentTarget).data("scroll");
+		var sid = $(e.currentTarget).data("sid");
+		var btn_area = $(e.currentTarget).parent();
+		var self = this;
+        var data = [];
+        data.push({name: "index", value: app.session.s_index});
+        data.push({name: "scroll_size", value: scroll_size});
+        data.push({name: "sid",  value: sid});
+        $.post(app.appURL+'tweets_scroll', data, function(response){
+            var html = self.get_tweets_html(response, '');
+            btn_area.replaceWith(html);
+          }, 'json').fail(function() {
+              $('.loading_text').fadeOut('slow');
+                $.confirm({
+                    title: 'Error',
+                    boxWidth: '600px',
+                    theme: 'pix-danger-modal',
+                    backgroundDismiss: true,
+                    content: "An error was encountered while connecting to the server, please try again.<br>Error code: tweets__tweets_submit",
+                    buttons: {
+                        cancel: {
+                            text: 'CLOSE',
+                            btnClass: 'btn-cancel',
+                        }
+                    }
+                });
+            });
+        return false;
+    }
 });

@@ -9,8 +9,8 @@ __email__ = "odehfiras@gmail.com"
 class Es_connector:
 
     # def __init__(self, host='http://206.189.211.142', port=9200, user='', password='', timeout=1000, index="test2", doc_type="tweet"):
-    # def __init__(self, host='localhost', port=9200, user='elastic', password='elastic', timeout=1000, index="test2", doc_type="tweet"):
-    def __init__(self, host='localhost', port=9200, user='', password='', timeout=1000, index="test2", doc_type="tweet"):
+    def __init__(self, host='localhost', port=9200, user='elastic', password='elastic', timeout=1000, index="test2", doc_type="tweet"):
+    # def __init__(self, host='localhost', port=9200, user='', password='', timeout=1000, index="test2", doc_type="tweet"):
 
         # Define config
         self.host = host
@@ -132,7 +132,7 @@ class Es_connector:
         data = self.es.search(
             index=self.index,
             doc_type=self.doc_type,
-            scroll='2m',
+            scroll='15m',
             size=self.size,
             body=query,
         )
@@ -146,7 +146,7 @@ class Es_connector:
 
         while scroll_size > 0:
             "Scrolling..."
-            data = self.es.scroll(scroll_id=sid, scroll='2m')
+            data = self.es.scroll(scroll_id=sid, scroll='15m')
 
             # Process current batch of hits
             res = process_hits(data['hits']['hits'], res)
@@ -158,6 +158,60 @@ class Es_connector:
             scroll_size = len(data['hits']['hits'])
 
         return res
+
+
+    def init_paginatedSearch(self, query):
+        res = []
+        # Process hits here
+        def process_hits(hits, results):
+            for item in hits:
+                results.append(item)
+            return results
+
+        # Check index exists
+        if not self.es.indices.exists(index=self.index):
+            print("Index " + self.index + " not exists")
+            exit()
+
+        # Init scroll by search
+        data = self.es.search(
+            index=self.index,
+            doc_type=self.doc_type,
+            scroll='15m',
+            size=self.size,
+            body=query,
+        )
+
+        # Get the scroll ID
+        sid = data['_scroll_id']
+        scroll_size = len(data['hits']['hits'])
+
+        # Before scroll, process current batch of hits
+        res = process_hits(data['hits']['hits'], res)
+        total = data['hits']['total']
+        scroll_size = total - scroll_size
+
+        return {"results":res, "sid":sid, "scroll_size":scroll_size, "total":total}
+
+
+    def loop_paginatedSearch(self, sid, scroll_size):
+        res = []
+        # Process hits here
+        def process_hits(hits, results):
+            for item in hits:
+                results.append(item)
+            return results
+
+        if scroll_size > 0:
+            data = self.es.scroll(scroll_id=sid, scroll='15m')
+            # Process current batch of hits
+            res = process_hits(data['hits']['hits'], res)
+            # Update the scroll ID
+            sid = data['_scroll_id']
+            # Get the number of results that returned in the last scroll
+            scroll_size = len(data['hits']['hits'])
+
+        return {"results": res, "sid": sid, "scroll_size": scroll_size}
 
 
     def getTweets(self):
@@ -178,7 +232,7 @@ class Es_connector:
         data = self.es.search(
             index=self.index,
             doc_type=self.doc_type,
-            scroll='2m',
+            scroll='15m',
             size=self.size,
             body=body
         )
@@ -192,7 +246,7 @@ class Es_connector:
 
         while scroll_size > 0:
             "Scrolling..."
-            data = self.es.scroll(scroll_id=sid, scroll='2m')
+            data = self.es.scroll(scroll_id=sid, scroll='15m')
 
             # Process current batch of hits
             process_hits(data['hits']['hits'])
@@ -230,7 +284,7 @@ class Es_connector:
         data = self.es.search(
             index=self.index,
             doc_type=self.doc_type,
-            scroll='2m',
+            scroll='15m',
             size=self.size,
             body=body
         )
@@ -244,7 +298,7 @@ class Es_connector:
 
         while scroll_size > 0:
             "Scrolling..."
-            data = self.es.scroll(scroll_id=sid, scroll='2m')
+            data = self.es.scroll(scroll_id=sid, scroll='15m')
 
             # Process current batch of hits
             process_hits(data['hits']['hits'])
@@ -274,7 +328,7 @@ class Es_connector:
         data = self.es.search(
             index=self.index,
             doc_type=self.doc_type,
-            scroll='2m',
+            scroll='15m',
             size=self.size,
             body=self.body
         )
@@ -289,7 +343,7 @@ class Es_connector:
 
         while scroll_size > 0:
             "Scrolling..."
-            data = self.es.scroll(scroll_id=sid, scroll='2m')
+            data = self.es.scroll(scroll_id=sid, scroll='15m')
 
             # Process current batch of hits
             process_hits(data['hits']['hits'])
@@ -316,7 +370,7 @@ class Es_connector:
         data = self.es.search(
             index=self.index,
             doc_type=self.doc_type,
-            scroll='2m',
+            scroll='15m',
             size=self.size,
             body=query
         )
@@ -331,7 +385,7 @@ class Es_connector:
 
         while scroll_size > 0:
             "Scrolling..."
-            data = self.es.scroll(scroll_id=sid, scroll='2m')
+            data = self.es.scroll(scroll_id=sid, scroll='15m')
 
             # Process current batch of hits
             process_hits(data['hits']['hits'])
@@ -361,7 +415,7 @@ class Es_connector:
         data = self.es.search(
             index=self.index,
             doc_type=self.doc_type,
-            scroll='2m',
+            scroll='15m',
             size=self.size,
             body=self.body
         )
@@ -376,7 +430,7 @@ class Es_connector:
 
         while scroll_size > 0:
             "Scrolling..."
-            data = self.es.scroll(scroll_id=sid, scroll='2m')
+            data = self.es.scroll(scroll_id=sid, scroll='15m')
 
             # Process current batch of hits
             process_hits(data['hits']['hits'])
@@ -407,7 +461,7 @@ class Es_connector:
         data = self.es.search(
             index=self.index,
             doc_type=self.doc_type,
-            scroll='2m',
+            scroll='15m',
             size=self.size,
             body=body
         )
@@ -421,7 +475,7 @@ class Es_connector:
 
         while scroll_size > 0:
             "Scrolling..."
-            data = self.es.scroll(scroll_id=sid, scroll='2m')
+            data = self.es.scroll(scroll_id=sid, scroll='15m')
 
             # Process current batch of hits
             process_hits(data['hits']['hits'])

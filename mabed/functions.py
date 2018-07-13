@@ -168,16 +168,17 @@ class Functions:
 
     def get_tweets(self, index="test3", word=""):
         my_connector = Es_connector(index=index)
-        res = my_connector.search({
-                "query": {
-                    "simple_query_string": {
-                      "fields": [
-                        "text"
-                      ],
-                      "query": word
-                    }
-                  }
-                })
+        # res = my_connector.search({
+        #         "query": {
+        #             "simple_query_string": {
+        #               "fields": [
+        #                 "text"
+        #               ],
+        #               "query": word
+        #             }
+        #           }
+        #         })
+
         # res = my_connector.bigSearch(
         #     {
         #         "_source": ["text", "id_str", "extended_entities", "user", "created_at", "link"],
@@ -190,11 +191,44 @@ class Functions:
         #             }
         #           }
         #     })
-        return res['hits']['hits']
+
+        res = my_connector.init_paginatedSearch({
+            "query": {
+                "simple_query_string": {
+                    "fields": [
+                        "text"
+                    ],
+                    "query": word
+                }
+            }
+        })
+        return res
+
+
+    def get_tweets_scroll(self, index, sid, scroll_size):
+        my_connector = Es_connector(index=index)
+        res = my_connector.loop_paginatedSearch(sid, scroll_size)
+        return res
 
     def get_big_tweets(self, index="test3", word=""):
         my_connector = Es_connector(index=index)
         res = my_connector.bigSearch(
+            {
+                "_source": ["text", "id_str", "extended_entities", "user", "created_at", "link"],
+                "query": {
+                    "simple_query_string": {
+                      "fields": [
+                        "text"
+                      ],
+                      "query": word
+                    }
+                  }
+            })
+        return res
+
+    def get_big_tweets_scroll(self, index="test3", word=""):
+        my_connector = Es_connector(index=index)
+        res = my_connector.init_paginatedSearch(
             {
                 "_source": ["text", "id_str", "extended_entities", "user", "created_at", "link"],
                 "query": {
@@ -251,8 +285,9 @@ class Functions:
                         }
                     }
                 }
-        print(query)
-        res = my_connector.search(query)
+        # print(query)
+        # res = my_connector.search(query)
+        res = my_connector.init_paginatedSearch(query)
         return res
 
 
@@ -312,18 +347,8 @@ class Functions:
             }
         }
 
-        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-        print(query)
-        res = my_connector.bigSearch(query)
-        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-        print(len(res))
-        # i = 0
-        # for r in res:
-        #     if r['_source']['imagesCluster'] == 1452:
-        #         print(r['_source']['id_str'])
-        #         print(i)
-        #         i+=1
-        # print(res['hits']['hits'])
+        # res = my_connector.bigSearch(query)
+        res = my_connector.init_paginatedSearch(query)
         return res
 
     def get_cluster_tweets(self, index="test3", cid=0):

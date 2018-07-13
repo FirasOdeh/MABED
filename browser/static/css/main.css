@@ -1200,3 +1200,7 @@ a.timeline_btn.options_btn_valid:hover { background-color: #279b37 !important;bo
 .cluster_state_btns .btn {
     margin: 0px;
 }
+
+.full_width {
+    width: 100%;
+}
