@@ -694,10 +694,12 @@ class Functions:
         session = session_connector.get(id)
         if session:
             print("Session:")
-            print(session)
+            # print(session)
             # 1. Delete session data from the tweets
             tweets_connector = Es_connector(index=session['_source']['s_index'], doc_type=session['_source']['s_type'])
-            tweets_connector.remove_field_all(session['_source']['s_name'])
+            session_name = 'session_'+session['_source']['s_name']
+            print(session_name)
+            tweets_connector.remove_field_all(session_name)
             # 2. Delete the session
             session_connector.delete(id)
             return True
