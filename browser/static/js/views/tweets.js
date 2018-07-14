@@ -10,6 +10,7 @@ app.views.tweets = Backbone.View.extend({
     initialize: function() {
         this.render();
         var handler = _.bind(this.render, this);
+        var self = this;
         $(document).on("click","body .tweet_state",function(e){
 			self.tweet_state(e);
 		});
