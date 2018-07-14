@@ -17,7 +17,7 @@ class Functions:
     def __init__(self):
         self.sessions_index = 'mabed_sessions'
         self.sessions_doc_type = 'session'
-        print("Functions init")
+        # print("Functions init")
 
     # ==================================================================
     # Event Detection
@@ -433,7 +433,7 @@ class Functions:
                         }
                     }
                 }
-        print(query)
+        # print(query)
         res = my_connector.search(query)
         return res
 
@@ -489,18 +489,18 @@ class Functions:
             }
           }
         })
-        print("Clusters")
-        print(res['aggregations']['group_by_cluster']['buckets'])
+        # print("Clusters")
+        # print(res['aggregations']['group_by_cluster']['buckets'])
         clusters = res['aggregations']['group_by_cluster']['buckets']
         with open(index+'.json') as f:
             data = json.load(f)
         for cluster in clusters:
-            print(cluster['key'])
-            images = data['duplicates'][cluster['key']]
-            print(images[0])
+            # print(cluster['key'])
+            # images = data['duplicates'][cluster['key']]
+            # print(images[0])
             cluster['image']=images[0]
             cluster['size'] = len(images)
-        print(clusters)
+        # print(clusters)
         return clusters
 
     def get_event_clusters(self, index="test3", main_term="", related_terms=""):

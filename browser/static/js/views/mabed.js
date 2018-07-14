@@ -61,7 +61,7 @@ app.views.mabed = Backbone.View.extend({
             boxWidth: '600px',
             useBootstrap: false,
             backgroundDismiss: false,
-            content: 'Please Don\'t close the page until you get the success message.<br>This may take several minutes.<div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
+            content: 'Please Don\'t close the page until you get the success message.<br>This may take a long time (more than 10 minutes).<div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
             defaultButtons: false,
             buttons: {
                 cancel: {

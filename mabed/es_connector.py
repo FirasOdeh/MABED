@@ -124,7 +124,7 @@ class Es_connector:
 
         # Check index exists
         if not self.es.indices.exists(index=self.index):
-            print("Index " + self.index + " not exists")
+            # print("Index " + self.index + " not exists")
             exit()
 
         # Init scroll by search
@@ -169,7 +169,7 @@ class Es_connector:
 
         # Check index exists
         if not self.es.indices.exists(index=self.index):
-            print("Index " + self.index + " not exists")
+            # print("Index " + self.index + " not exists")
             exit()
 
         # Init scroll by search
@@ -221,7 +221,7 @@ class Es_connector:
 
         # Check index exists
         if not self.es.indices.exists(index=self.index):
-            print("Index " + self.index + " not exists")
+            # print("Index " + self.index + " not exists")
             exit()
 
         body = self.body
@@ -268,7 +268,7 @@ class Es_connector:
 
         # Check index exists
         if not self.es.indices.exists(index=self.index):
-            print("Index " + self.index + " not exists")
+            # print("Index " + self.index + " not exists")
             exit()
 
         session ='session_'+session
@@ -320,7 +320,7 @@ class Es_connector:
 
         # Check index exists
         if not self.es.indices.exists(index=self.index):
-            print("Index " + self.index + " not exists")
+            # print("Index " + self.index + " not exists")
             exit()
 
         # Init scroll by search
@@ -337,7 +337,7 @@ class Es_connector:
         scroll_size = len(data['hits']['hits'])
 
         # Before scroll, process current batch of hits
-        print(data['hits']['total'])
+        # print(data['hits']['total'])
         process_hits(data['hits']['hits'])
 
         while scroll_size > 0:
@@ -362,7 +362,7 @@ class Es_connector:
 
         # Check index exists
         if not self.es.indices.exists(index=self.index):
-            print("Index " + self.index + " not exists")
+            # print("Index " + self.index + " not exists")
             exit()
 
         # Init scroll by search
@@ -379,7 +379,7 @@ class Es_connector:
         scroll_size = len(data['hits']['hits'])
 
         # Before scroll, process current batch of hits
-        print(data['hits']['total'])
+        # print(data['hits']['total'])
         process_hits(data['hits']['hits'])
 
         while scroll_size > 0:
@@ -450,7 +450,7 @@ class Es_connector:
 
         # Check index exists
         if not self.es.indices.exists(index=self.index):
-            print("Index " + self.index + " not exists")
+            # print("Index " + self.index + " not exists")
             exit()
 
         body = self.body

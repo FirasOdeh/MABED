@@ -4,7 +4,8 @@ app.views.tweets = Backbone.View.extend({
         'submit #tweets_form': 'tweets_submit',
         'click .tweet_state': 'tweet_state',
         'click .cluster_tweets': 'cluster_tweets',
-        'click .scroll_tweets': 'scroll_tweets'
+        'click .scroll_tweets': 'scroll_tweets',
+        'click .cluster_state': 'cluster_state'
     },
     initialize: function() {
         this.render();
@@ -181,7 +182,7 @@ app.views.tweets = Backbone.View.extend({
     display_tweets: function(response, t0, word){
         var html = this.get_tweets_html(response, '');
         var chtml = "";
-        var cbtn = "";
+        var cbtn = "", state_btns="";
         if(response.clusters){
             $.each(response.clusters, function(i, cluster){
                 if(i>=20){return false;}
@@ -191,9 +192,14 @@ app.views.tweets = Backbone.View.extend({
                 }
                 if(word){
                     cbtn = '<a href="#" class="btn btn-primary btn-flat cluster_tweets" data-word="'+word+'" data-cid="'+cluster.key+'"><strong>Show tweets</strong></a>';
+                    state_btns = '<div class="cluster_state_btns">';
+                        state_btns += '<a href="#" class="btn btn-outline-success cluster_state" data-state="confirmed" data-cid="' + cluster.key + '"><strong>Confirmed</strong></a>';
+                        state_btns += ' <a href="#" class="btn btn-outline-danger cluster_state" data-state="negative" data-cid="' + cluster.key + '"><strong>Negative</strong></a>';
+                        state_btns += '</div>';
                 }
                 chtml += '<div class="card p-3 '+cbg+'">'+
                     '<img class="card-img-top" src="'+app.imagesURL+app.session.s_index+'/'+cluster.image+'" alt="">'+
+                    state_btns +
                     '<div class="card-body">'+
                         '<p class="card-text">'+cluster.doc_count+' related tweets contain this image</p>'+
                         '<p class="card-text">Cluster size: '+cluster.size+'</p>'+
@@ -278,5 +284,49 @@ app.views.tweets = Backbone.View.extend({
                 });
             });
         return false;
-    }
+    },
+	cluster_state: function(e){
+    	e.preventDefault();
+    	var state = $(e.currentTarget).data("state");
+    	var cid = $(e.currentTarget).data("cid");
+    	var data = [];
+		data.push({name: "index", value: app.session.s_index});
+		data.push({name: "session", value: app.session.s_name});
+		data.push({name: "state", value: state});
+		data.push({name: "cid", value: cid});
+		var jc = $.confirm({
+				theme: 'pix-default-modal',
+				title: 'Changing tweets state',
+				boxWidth: '600px',
+				useBootstrap: false,
+				backgroundDismiss: false,
+				content: 'Please Don\'t close the page.<div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
+				defaultButtons: false,
+				buttons: {
+					cancel: {
+						text: 'OK',
+						btnClass: 'btn-cancel'
+					}
+				}
+			});
+		$.post(app.appURL+'mark_cluster', data, function(response){
+			jc.close();
+		}).fail(function() {
+            jc.close();
+            $.confirm({
+                title: 'Error',
+                boxWidth: '600px',
+                theme: 'pix-danger-modal',
+                backgroundDismiss: true,
+                content: "An error was encountered while connecting to the server, please try again.",
+                buttons: {
+                    cancel: {
+                        text: 'CANCEL',
+                        btnClass: 'btn-cancel'
+                    }
+                }
+            });
+        });
+    	return false;
+	}
 });

@@ -338,7 +338,39 @@ app.views.client = Backbone.View.extend({
 		data.push({name: "session", value: app.session.s_name});
 		data.push({name: "state", value: state});
 		data.push({name: "cid", value: cid});
-    	// alert(state);
+		var jc = $.confirm({
+				theme: 'pix-default-modal',
+				title: 'Changing tweets state',
+				boxWidth: '600px',
+				useBootstrap: false,
+				backgroundDismiss: false,
+				content: 'Please Don\'t close the page.<div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
+				defaultButtons: false,
+				buttons: {
+					cancel: {
+						text: 'OK',
+						btnClass: 'btn-cancel'
+					}
+				}
+			});
+		$.post(app.appURL+'mark_cluster', data, function(response){
+			jc.close();
+		}).fail(function() {
+            jc.close();
+            $.confirm({
+                title: 'Error',
+                boxWidth: '600px',
+                theme: 'pix-danger-modal',
+                backgroundDismiss: true,
+                content: "An error was encountered while connecting to the server, please try again.",
+                buttons: {
+                    cancel: {
+                        text: 'CANCEL',
+                        btnClass: 'btn-cancel'
+                    }
+                }
+            });
+        });
     	return false;
 	}
 });

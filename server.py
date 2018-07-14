@@ -48,7 +48,7 @@ def add_header(r):
 # @cross_origin()
 def settings():
     data = request.form
-    print(data)
+    # print(data)
     return jsonify(data)
 
 
@@ -93,7 +93,7 @@ def event_descriptions():
 # @cross_origin()
 def detect_events():
     data = request.form
-    print(data)
+    # print(data)
     index = data['index']
     k = int(data['top_events'])
     maf = float(data['min_absolute_frequency'])
@@ -148,11 +148,11 @@ def images():
 # @cross_origin()
 def tweets():
     data = request.form
-    print(data['word'])
-    print(data['index'])
+    # print(data['word'])
+    # print(data['index'])
     tweets= functions.get_tweets(index=data['index'], word=data['word'])
     clusters= functions.get_clusters(index=data['index'], word=data['word'])
-    print(len(tweets))
+    # print(len(tweets))
     return jsonify({"tweets": tweets, "clusters": clusters})
 
 
@@ -170,7 +170,7 @@ def tweets_scroll():
 def event_tweets():
     data = request.form
     index = data['index']
-    print(index)
+    # print(index)
     event = json.loads(data['obj'])
     main_term = event['main_term'].replace(",", " ")
     related_terms = event['related_terms']
@@ -227,7 +227,7 @@ def cluster_search_tweets():
 def event_image():
     data = request.form
     index = data['index']
-    print(index)
+    # print(index)
     event = json.loads(data['obj'])
     main_term = event['main_term'].replace(",", " ")
     related_terms = event['related_terms']
@@ -244,7 +244,7 @@ def event_image():
 # @cross_origin()
 def mark_valid():
     data = request.form
-    print(data)
+    # print(data)
     res = functions.set_all_status("twitter2015", "session_Twitter2015", "proposed")
     return jsonify(res)
 
@@ -254,7 +254,7 @@ def mark_valid():
 # @cross_origin()
 def mark_event():
     data = request.form
-    print(data)
+    # print(data)
     index = data['index']
     session = data['session']
     functions.set_status(index, session, data)
@@ -264,7 +264,7 @@ def mark_event():
 # @cross_origin()
 def mark_cluster():
     data = request.form
-    print(data)
+    # print(data)
     index = data['index']
     session = data['session']
     cid = data['cid']
@@ -276,7 +276,7 @@ def mark_cluster():
 # @cross_origin()
 def mark_tweet():
     data = request.form
-    print(data)
+    # print(data)
     index = data['index']
     session = data['session']
     tid = data['tid']
@@ -372,7 +372,7 @@ def export_confirmed_tweets():
 # @cross_origin()
 def sessions():
     data = request.form
-    print(data)
+    # print(data)
     # up1 = functions.update_all("mabed_sessions", "session", "s_type", "tweet")
     # up = functions.delete_session("s1")
     # print(up)
@@ -387,7 +387,7 @@ def add_session():
     name = data['s_name']
     index = data['s_index']
     res = functions.add_session(name, index)
-    print(res)
+    # print(res)
     status = False
     if res:
         status = True
@@ -400,7 +400,7 @@ def add_session():
 def delete_session():
     data = request.form
     id = data['id']
-    print(id)
+    # print(id)
     res = functions.delete_session(id)
     return jsonify({"result": res})
 
@@ -411,7 +411,7 @@ def delete_session():
 def get_session():
     data = request.form
     id = data['id']
-    print(id)
+    # print(id)
     res = functions.get_session(id)
     status = False
     if res:
@@ -428,7 +428,7 @@ def update_session_results():
     impact_data = data['impact_data']
     index = data['index']
     res = functions.update_session_results(index, events, impact_data)
-    print(res)
+    # print(res)
     status = False
     if res:
         status = True
@@ -442,7 +442,7 @@ def get_session_results():
     data = request.form
     index = data['index']
     res = functions.get_session_results(index)
-    print(res)
+    # print(res)
     status = False
     if res:
         status = True
