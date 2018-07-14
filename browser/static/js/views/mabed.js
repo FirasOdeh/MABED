@@ -88,6 +88,22 @@ app.views.mabed = Backbone.View.extend({
               localStorage.setItem('impact_data', impact_dataCollection);
               $.post(app.appURL+'update_session_results', {index: app.session_id, events: jsonCollection, impact_data:impact_dataCollection}, function(res){
                   console.log(res);
+                   $.confirm({
+                    theme: 'pix-default-modal',
+                    title: 'Success',
+                    boxWidth: '600px',
+                    type: 'green',
+                    useBootstrap: false,
+                    backgroundDismiss: false,
+                    content: 'Event detecting was finished successfully!',
+                    defaultButtons: false,
+                    buttons: {
+                        cancel: {
+                            text: 'OK',
+                            btnClass: 'btn-cancel'
+                        }
+                    }
+                });
               });
           }else{
               console.log("No result");
