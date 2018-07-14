@@ -496,7 +496,7 @@ class Functions:
             data = json.load(f)
         for cluster in clusters:
             # print(cluster['key'])
-            # images = data['duplicates'][cluster['key']]
+            images = data['duplicates'][cluster['key']]
             # print(images[0])
             cluster['image']=images[0]
             cluster['size'] = len(images)
