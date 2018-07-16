@@ -461,4 +461,4 @@ def index(user):
 if __name__ == '__main__':
     functions = Functions()
     # app.run(debug=True, host='localhost', port=5000, threaded=True)
-    app.run(debug=True, host='mediamining.univ-lyon2.fr', port=5000, threaded=True)
+    app.run(debug=False, host='mediamining.univ-lyon2.fr', port=5000, threaded=True)

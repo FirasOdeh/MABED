@@ -27,7 +27,7 @@ app.views.settings = Backbone.View.extend({
             boxWidth: '600px',
             useBootstrap: false,
             backgroundDismiss: false,
-            content: 'Please Don\'t close the page until you get the success message.<br>This may take a long time (more than 30 minutes).<div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
+            content: 'Please Don\'t close the page until you get the success message.<br>This may take a long time (more than an hour).<div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
             defaultButtons: false,
             buttons: {
                 cancel: {
