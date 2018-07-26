@@ -5,7 +5,9 @@ app.views.tweets = Backbone.View.extend({
         'click .tweet_state': 'tweet_state',
         'click .cluster_tweets': 'cluster_tweets',
         'click .scroll_tweets': 'scroll_tweets',
-        'click .cluster_state': 'cluster_state'
+        'click .cluster_state': 'cluster_state',
+        'click .btn_filter': 'filter_tweets',
+        'click .all_tweets_state': 'all_tweets_state',
     },
     initialize: function() {
         this.render();
@@ -83,6 +85,9 @@ app.views.tweets = Backbone.View.extend({
     get_tweets_html: function(response, classes, cid){
         var html = "";
         var template = _.template($("#tpl-item-tweet").html());
+
+
+
         $.each(response.tweets.results, function(i, tweet){
             var imgs = "";
             var t_classes = classes;
@@ -181,7 +186,13 @@ app.views.tweets = Backbone.View.extend({
         return false;
     },
     display_tweets: function(response, t0, word){
-        var html = this.get_tweets_html(response, '');
+        var html = '';
+        html += '<div class="col-12 pix-padding-top-30 pix-padding-bottom-30">\n' +
+            '                    <a class="btn btn-lg btn-success pix-white fly shadow scale btn_filter" data-state="confirmed" href="#" role="button"><strong>Confirmed</strong></a>\n' +
+            '                    <a class="btn btn-lg btn-danger pix-white fly shadow scale btn_filter" data-state="negative" href="#" role="button"><strong>Negative</strong></a>\n' +
+            '                    <a class="btn btn-lg btn-primary pix-white fly shadow scale btn_filter" data-state="proposed" href="#" role="button"><strong>Proposed</strong></a>\n' +
+            '              </div>';
+        html += this.get_tweets_html(response, '');
         var chtml = "";
         var cbtn = "", state_btns="";
         if(response.clusters){
@@ -211,6 +222,8 @@ app.views.tweets = Backbone.View.extend({
             });
             $('#imagesClusters').html(chtml);
         }
+
+        $('.state_btns').show();
         $('#tweets_result').html(html);
         $('.loading_text').fadeOut('slow');
         $('#tweets_results').fadeIn('slow');
@@ -329,5 +342,84 @@ app.views.tweets = Backbone.View.extend({
             });
         });
     	return false;
-	}
+	},
+    filter_tweets: function(e){
+	    e.preventDefault();
+	    $('#tweets_results').fadeOut('slow');
+        $('.loading_text').fadeIn('slow');
+        var state = $(e.currentTarget).data("state");
+        var t0 = performance.now();
+        var data = $('#tweets_form').serializeArray();
+      data.push({name: "index", value: app.session.s_index});
+      data.push({name: "state", value: state});
+      data.push({name: "session", value:  'session_'+app.session.s_name});
+      var self = this;
+      $.post(app.appURL+'tweets_filter', data, function(response){
+        self.display_tweets(response, t0, data[0].value);
+      }, 'json').fail(function() {
+          $('.loading_text').fadeOut('slow');
+            $.confirm({
+                title: 'Error',
+                boxWidth: '600px',
+                theme: 'pix-danger-modal',
+                backgroundDismiss: true,
+                content: "An error was encountered while connecting to the server, please try again.<br>Error code: tweets__tweets_submit",
+                buttons: {
+                    cancel: {
+                        text: 'CLOSE',
+                        btnClass: 'btn-cancel',
+                    }
+                }
+            });
+        });
+	    return false;
+    },
+    all_tweets_state: function(e){
+        e.preventDefault();
+        var state = $(e.currentTarget).data("state");
+        var data = $('#tweets_form').serializeArray();
+
+        data.push({name: "index", value: app.session.s_index});
+        data.push({name: "session", value: app.session.s_name});
+        data.push({name: "state", value: state});
+
+         var jc = $.confirm({
+            theme: 'pix-default-modal',
+            title: 'Changing tweets state',
+            boxWidth: '600px',
+            useBootstrap: false,
+            backgroundDismiss: false,
+            content: 'Please Don\'t close the page.<div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
+            defaultButtons: false,
+            buttons: {
+                cancel: {
+                    text: 'OK',
+                    btnClass: 'btn-cancel'
+                }
+            }
+        });
+
+        $.post(app.appURL+'mark_search_tweets', data, function(response){
+            jc.close();
+            console.log(response);
+                $.confirm({
+                theme: 'pix-default-modal',
+                title: 'Changing tweets state',
+                boxWidth: '600px',
+                useBootstrap: false,
+                backgroundDismiss: false,
+                content: 'Please click the search button again to refresh the result!',
+                defaultButtons: false,
+                buttons: {
+                    cancel: {
+                        text: 'OK',
+                        btnClass: 'btn-cancel'
+                    }
+                }
+            });
+        }, 'json');
+
+
+        return false;
+    }
 });

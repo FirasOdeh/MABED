@@ -7,7 +7,8 @@ app.views.client = Backbone.View.extend({
 				'click .cluster_tweets': 'cluster_tweets',
 				'click .tweet_state': 'tweet_state',
         		'click .scroll_tweets': 'scroll_tweets',
-				'click .cluster_state': 'cluster_state'
+				'click .cluster_state': 'cluster_state',
+				'click .btn_filter': 'filter_tweets'
 		},
 	  initialize: function() {
 	      this.render();
@@ -230,7 +231,13 @@ app.views.client = Backbone.View.extend({
 			return html;
 		},
 		display_tweets: function(response, t0, eid){
-			var html = this.get_tweets_html(response, '');
+			var html = '';
+			html += '<div class="col-12 pix-padding-top-30 pix-padding-bottom-30">\n' +
+				'                    <a class="btn btn-lg btn-success pix-white fly shadow scale btn_filter" data-eid="' + eid + '" data-state="confirmed" href="#" role="button"><strong>Confirmed</strong></a>\n' +
+				'                    <a class="btn btn-lg btn-danger pix-white fly shadow scale btn_filter" data-eid="' + eid + '" data-state="negative" href="#" role="button"><strong>Negative</strong></a>\n' +
+				'                    <a class="btn btn-lg btn-primary pix-white fly shadow scale btn_filter" data-eid="' + eid + '" data-state="proposed" href="#" role="button"><strong>Proposed</strong></a>\n' +
+		'              </div>';
+        	html += this.get_tweets_html(response, '');
 			var chtml = "";
 			var cbtn = "", state_btns="";
 			var i = 0;
@@ -372,5 +379,20 @@ app.views.client = Backbone.View.extend({
             });
         });
     	return false;
-	}
+	},
+	filter_tweets: function(e){
+	    e.preventDefault();
+	    var eid = $(e.currentTarget).data("eid");
+	    var ev = app.eventsCollection.get({ cid: eid }).toJSON();
+	    var state = $(e.currentTarget).data("state");
+	    var session = 'session_'+app.session.s_name;
+	    var self = this;
+	    $('#tweets_results').fadeOut('slow');
+	  $('.loading_text').fadeIn('slow');
+	  var t0 = performance.now();
+	    $.post(app.appURL+'event_filter_tweets', {obj: JSON.stringify(ev), index: app.session.s_index, state:state, session: session}, function(response){
+			self.display_tweets(response, t0, eid);
+		}, 'json');
+	    return false;
+    }
 });

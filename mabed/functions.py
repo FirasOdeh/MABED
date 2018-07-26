@@ -239,6 +239,36 @@ class Functions:
             })
         return res
 
+    def get_tweets_query_state(self, index="test3", word="", state="proposed", session=""):
+        my_connector = Es_connector(index=index)
+        query = {
+              "query": {
+                "bool": {
+                  "must": {
+                    "simple_query_string": {
+                      "fields": [
+                        "text"
+                      ],
+                      "query": word
+                    }
+                  },
+                  "filter": {
+                    "bool": {
+                      "should": [
+                        {
+                          "match": {
+                            session: state
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+        res = my_connector.init_paginatedSearch(query)
+        return res
+
     def get_big_tweets_scroll(self, index="test3", word=""):
         my_connector = Es_connector(index=index)
         res = my_connector.init_paginatedSearch(
@@ -300,6 +330,66 @@ class Functions:
                 }
         # print(query)
         # res = my_connector.search(query)
+        res = my_connector.init_paginatedSearch(query)
+        return res
+
+
+    def get_event_filter_tweets(self, index="test3", main_term="", related_terms="", state = "proposed", session=""):
+        my_connector = Es_connector(index=index)
+        terms = []
+        words = main_term + ' '
+        for t in related_terms:
+            terms.append({ "match": {
+                    "text": {
+                        "query": t['word'],
+                        "boost": t['value']
+                    }
+                }})
+            words += t['word']+ " "
+        terms.append({"match": {
+            "text": {
+                "query": main_term,
+                "boost": 2
+            }
+        }})
+        # query = {
+        #     "sort": [
+        #         "_score"
+        #     ],
+        #         "query": {
+        #                 "bool": {
+        #                     "should": terms
+        #                 }
+        #             }
+        #         }
+
+        query = {
+            "sort": [
+                "_score"
+            ],
+              "query": {
+                "bool": {
+                  "must": [
+                    {
+                      "bool": {
+                        "should": terms
+                      }
+                    }
+                  ],
+                  "filter": {
+                    "bool": {
+                      "should": [
+                        {
+                          "match": {
+                            session: state
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
         res = my_connector.init_paginatedSearch(query)
         return res
 
@@ -554,9 +644,9 @@ class Functions:
                 }
             }
         }
-        print(query)
+        # print(query)
         res = my_connector.search(query)
-        print("Clusters")
+        # print("Clusters")
         # print(res['aggregations']['group_by_cluster']['buckets'])
         clusters = res['aggregations']['group_by_cluster']['buckets']
         with open(index + '.json') as f:
@@ -593,9 +683,9 @@ class Functions:
             }
             # cres1 = my_connector.search(q1)
             cres = my_connector.count(q2)
-            print(cluster['key'])
+            # print(cluster['key'])
             images = data['duplicates'][cluster['key']]
-            print(images[0])
+            # print(images[0])
             cluster['image'] = images[0]
             # cluster['size'] = len(images)
             # print(cres)
@@ -603,7 +693,7 @@ class Functions:
             # cluster['size2'] = cres1['hits']['total']
             # if cluster['key']==1452:
             #     print(cluster)
-        print(clusters)
+        # print(clusters)
         return clusters
 
     # ==================================================================
@@ -625,7 +715,6 @@ class Functions:
     # Get session by session ID
     def get_session(self, id):
         my_connector = Es_connector(index=self.sessions_index, doc_type=self.sessions_doc_type)
-        print("firas")
         res = my_connector.get(id)
         return res
 
@@ -693,7 +782,7 @@ class Functions:
         session_connector = Es_connector(index=self.sessions_index, doc_type=self.sessions_doc_type)
         session = session_connector.get(id)
         if session:
-            print("Session:")
+            print("delete Session")
             # print(session)
             # 1. Delete session data from the tweets
             tweets_connector = Es_connector(index=session['_source']['s_index'], doc_type=session['_source']['s_type'])
@@ -721,11 +810,11 @@ class Functions:
         # All tweets
         session = 'session_'+session
         event = json.loads(data['event'])
-        print("------------------------")
-        print(data)
-        print("------------------------")
-        print(event)
-        print(event['main_term'])
+        # print("------------------------")
+        # print(data)
+        # print("------------------------")
+        # print(event)
+        # print(event['main_term'])
         terms = []
         words = event['main_term'] + ' '
         for t in event['related_terms']:
@@ -742,18 +831,75 @@ class Functions:
                 "boost": 2
             }
         }})
+        # query = {
+        #     "query": {
+        #         "bool": {
+        #             "should": terms
+        #         }
+        #     }
+        # }
+
         query = {
-            "query": {
-                "bool": {
-                    "should": terms
+                  "query": {
+                    "bool": {
+                      "must": [
+                        {
+                          "bool": {
+                            "should": terms
+                          }
+                        }
+                      ],
+                      "filter": {
+                        "bool": {
+                          "should": [
+                            {
+                              "match": {
+                                session: "proposed"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
                 }
-            }
-        }
 
         # print(query)
         res = tweets_connector.update_query(query, session, data['status'])
         # Event related
 
+        return res
+
+
+    def set_search_status(self, index, session, state, word):
+        tweets_connector = Es_connector(index=index, doc_type="tweet")
+        session = 'session_'+session
+        query = {
+            "query": {
+                "bool": {
+                    "must": {
+                        "simple_query_string": {
+                            "fields": [
+                                "text"
+                            ],
+                            "query": word
+                        }
+                    },
+                    "filter": {
+                        "bool": {
+                            "should": [
+                                {
+                                    "match": {
+                                        session: "proposed"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+        res = tweets_connector.update_query(query, session, state)
         return res
 
     def set_cluster_state(self, index, session, cid, state):
