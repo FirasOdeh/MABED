@@ -243,7 +243,7 @@ app.views.client = Backbone.View.extend({
 			var i = 0;
 			if(response.clusters) {
                 $.each(response.clusters, function (i, cluster) {
-                    if (i >= 30) {
+                    if (i >= 40) {
                         return false;
                     }
                     i++;
