@@ -52,6 +52,21 @@
           <li class="nav-item" id="nav-tweets">
             <a class="nav-link" href="#tweets">Tweet Search</a>
           </li>
+{#            <li class="nav-item" id="nav-beta">#}
+{#            <a class="nav-link" href="#beta">Beta</a>#}
+{#          </li>#}
+            <li class="nav-item" id="nav-beta2">
+            <a class="nav-link" href="#beta2">Model</a>
+          </li>
+{#            <li class="nav-item dropdown">#}
+{#        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
+{#          New#}
+{#        </a>#}
+{#        <div class="dropdown-menu" aria-labelledby="navbarDropdown">#}
+{#          <a class="dropdown-item" href="#beta">Beta</a>#}
+{#          <a class="dropdown-item" href="#beta2">Beta2</a>#}
+{#        </div>#}
+{#      </li>#}
 
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -263,7 +278,8 @@
           </div>
 
             <div class="col-12 pix-margin-top-20 pix-margin-bottom-20 state_btns" style="display:none;">
-            Mark all tweets as: <a href="#" data-cid="" data-state="negative" class="timeline_btn all_tweets_state options_btn_negative">negative</a> <a href="#" data-state="confirmed" class="timeline_btn all_tweets_state options_btn_valid">Confirmed</a>
+            Mark tweets as: <a href="#" data-cid="" data-state="negative" class="timeline_btn all_tweets_state options_btn_negative">negative</a> <a href="#" data-state="confirmed" class="timeline_btn all_tweets_state options_btn_valid">Confirmed</a>
+                <label><input type="checkbox" id="force_all" value=""> <span style="position:relative;top:2px;left:3px;">Force change all tweets</span></label>
                 </div>
 
           <div class="col-12 pix-margin-top-10">
@@ -468,6 +484,299 @@
           </div>
   </script>
 
+
+
+    <script type="text/template" id="tpl-page-beta">
+    <div class="pix-padding-v-65 gray-bg bg-lighten-4">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 pix-margin-bottom-30">
+            <h2 class="pix-gray darken-4 font-black">Step 1: Statistics</h2>
+          </div>
+
+          <div class="col-12 col-sm-12">
+
+
+              <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Date</th>
+                      <th scope="col">Main terms</th>
+                      <th scope="col">Related Terms</th>
+                      <th scope="col">Number of Tweets</th>
+                      <th scope="col">Percentage of all tweets</th>
+                        <th scope="col">Analys this event</th>
+                    </tr>
+                  </thead>
+                  <tbody id="main_table">
+                  </tbody>
+                </table>
+            <hr>
+              <h6><strong>Non detected tweets:</strong> <span id="non_detected_num">Loading...</span></h6>
+              <h6><strong>All tweets:</strong> <span id="all_num">Loading...</span></h6>
+              <h6><strong>Detection percentage:</strong> <span id="percentage_num">Loading...</span></h6>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pix-padding-v-65">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 pix-margin-bottom-30">
+            <h2 class="pix-gray darken-4 font-black">Step 2: Keyword Detection</h2>
+          </div>
+          <div class="col-12 col-sm-12 pix-margin-v-30">
+            In this step we will use word embedding technique (using word2vec model) on the tweets of each event to generate a list of the top 20 similar keywords.
+              <br>
+              <br>
+              <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Main terms</th>
+                      <th scope="col">Related terms</th>
+                      <th scope="col">New terms</th>
+                    </tr>
+                  </thead>
+                  <tbody id="keywords">
+
+                  </tbody>
+                </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pix-padding-v-65 gray-bg bg-lighten-4">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 pix-margin-bottom-30">
+            <h2 class="pix-gray darken-4 font-black">Step 3: Calculate the sum of squared errors (SSE)</h2>
+          </div>
+
+          <div class="col-12 col-sm-12">
+            For each event, we calculate SSE for each value of n (the number of top new tokens)<br><br>
+<pre>
+for each n ∈ ℤ : n ∈ [1,20]
+    sse[n] = 0;
+    for each event ∈ events
+        for each tweet ∈ event
+            sse[n] += (tweet_score - mean_score)^2
+</pre>
+
+               <br>
+
+              <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Event Main terms</th>
+                      <th scope="col">SSE values</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sse_results">
+
+                  </tbody>
+                </table>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pix-padding-v-65">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 pix-margin-bottom-30">
+            <h2 class="pix-gray darken-4 font-black">Step 4: Elbow Method</h2>
+          </div>
+          <div class="col-12 col-sm-12 pix-margin-v-30">
+            Optimal number of keywords
+              <br>
+              <br>
+              <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Event Main terms</th>
+                      <th scope="col">Elbow Method Results</th>
+                    </tr>
+                  </thead>
+                  <tbody id="elbow_results">
+{#<td>1</td>#}
+{#<td><div id="chartContainer" style="height: 370px; width: 100%;"></div></td>#}
+                  </tbody>
+                </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pix-padding-v-65 gray-bg bg-lighten-4">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 pix-margin-bottom-30">
+            <h2 class="pix-gray darken-4 font-black">Step 5: Resuts</h2>
+          </div>
+
+          <div class="col-12 col-sm-12">
+            comparison
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </script>
+
+
+
+
+
+  <script type="text/template" id="tpl-page-beta2">
+    <div class="pix-padding-v-65">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 pix-margin-bottom-30">
+            <h2 class="pix-gray darken-4 font-black">Step 1: Statistics</h2>
+          </div>
+
+          <div class="col-12 col-sm-12">
+
+
+              <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Date</th>
+                      <th scope="col">Main terms</th>
+                      <th scope="col">Related Terms</th>
+                      <th scope="col">Number of Tweets</th>
+                      <th scope="col">Percentage of all tweets</th>
+                      <th scope="col">Analys this event</th>
+                    </tr>
+                  </thead>
+                  <tbody id="main_table">
+                  </tbody>
+                </table>
+            <hr>
+              <h6><strong>Non detected tweets:</strong> <span id="non_detected_num">Loading...</span></h6>
+              <h6><strong>All tweets:</strong> <span id="all_num">Loading...</span></h6>
+              <h6><strong>Detection percentage:</strong> <span id="percentage_num">Loading...</span></h6>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pix-padding-v-65 gray-bg bg-lighten-4">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 pix-margin-bottom-30">
+            <h2 class="pix-gray darken-4 font-black">Step 2: Keyword Detection</h2>
+          </div>
+          <div class="col-12 col-sm-12 pix-margin-v-30">
+            In this step we will use word embedding technique (using word2vec model) on the tweets of each event to generate a list of the top 20 similar keywords.
+              <br>
+              <br>
+              <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Main terms</th>
+                      <th scope="col">Related terms</th>
+                      <th scope="col">New terms</th>
+                    </tr>
+                  </thead>
+                  <tbody id="keywords">
+
+                  </tbody>
+                </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pix-padding-v-65">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 pix-margin-bottom-30">
+            <h2 class="pix-gray darken-4 font-black">Step 3: Calculate the percentage of intersection</h2>
+          </div>
+
+          <div class="col-12 col-sm-12">
+            We calculate the percentage of intersection between the event results and the results of each new keyword<br><br>
+              <img src="static/images/step3.png">
+               <br>
+               <br>
+
+              <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Event Main terms</th>
+                      <th scope="col">percentage</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sse_results">
+
+                  </tbody>
+                </table>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pix-padding-v-65 gray-bg bg-lighten-4">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 pix-margin-bottom-30">
+            <h2 class="pix-gray darken-4 font-black">Step 4: Elbow Method</h2>
+          </div>
+          <div class="col-12 col-sm-12 pix-margin-v-30">
+            Optimal number of keywords
+              <br>
+              <br>
+              <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Event Main terms</th>
+                      <th scope="col">Elbow Method Results</th>
+                    </tr>
+                  </thead>
+                  <tbody id="elbow_results">
+{#<td>1</td>#}
+{#<td><div id="chartContainer" style="height: 370px; width: 100%;"></div></td>#}
+                  </tbody>
+                </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pix-padding-v-65">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 pix-margin-bottom-30">
+            <h2 class="pix-gray darken-4 font-black">Step 5: Resuts</h2>
+          </div>
+
+          <div class="col-12 col-sm-12" id="step5">
+</div>
+            <br>
+            <br>
+            <div class="col-12 col-sm-12">
+             <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Value</th>
+                      <th scope="col">Words</th>
+                      <th scope="col">Tweets count</th>
+                      <th scope="col">Reviewed Tweets count</th>
+                      <th scope="col">Confirmed tweets count</th>
+                      <th scope="col">Confirmed Percentage</th>
+                      <th scope="col">New Confirmed Percentage</th>
+                    </tr>
+                  </thead>
+                  <tbody id="step5_table">
+                  </tbody>
+                </table>
+                </div>
+        </div>
+      </div>
+    </div>
+  </script>
+
   <script src="https://cdn.knightlab.com/libs/timeline3/latest/js/timeline.js"></script>
   <script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
   <script src="static/js/vendor/jquery-1.10.2.min.js"></script>
@@ -475,6 +784,8 @@
   <script src="http://underscorejs.org/underscore-min.js"></script>
   <script src="static/js/vendor/backbone.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.js"></script>
+  <script src="static/plugins/canvasjs/canvasjs.min.js"></script>
+
 
   <script src="static/plugins/d3/d3.min.js"></script>
   <script src="static/plugins/d3/nv.d3.min.js"></script>
@@ -486,6 +797,8 @@
   <script src="static/js/views/mabed.js"></script>
   <script src="static/js/views/tweets.js"></script>
   <script src="static/js/views/events.js"></script>
+  <script src="static/js/views/beta.js"></script>
+  <script src="static/js/views/beta2.js"></script>
   <script src="static/js/models/event.js"></script>
   <script src="static/js/collections/events.js"></script>
 

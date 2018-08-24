@@ -378,37 +378,19 @@ app.views.tweets = Backbone.View.extend({
         e.preventDefault();
         var state = $(e.currentTarget).data("state");
         var data = $('#tweets_form').serializeArray();
+        var force = document.getElementById('force_all');
 
-        data.push({name: "index", value: app.session.s_index});
-        data.push({name: "session", value: app.session.s_name});
-        data.push({name: "state", value: state});
+         data.push({name: "index", value: app.session.s_index});
+            data.push({name: "session", value: app.session.s_name});
+            data.push({name: "state", value: state});
 
-         var jc = $.confirm({
-            theme: 'pix-default-modal',
-            title: 'Changing tweets state',
-            boxWidth: '600px',
-            useBootstrap: false,
-            backgroundDismiss: false,
-            content: 'Please Don\'t close the page.<div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
-            defaultButtons: false,
-            buttons: {
-                cancel: {
-                    text: 'OK',
-                    btnClass: 'btn-cancel'
-                }
-            }
-        });
-
-        $.post(app.appURL+'mark_search_tweets', data, function(response){
-            jc.close();
-            console.log(response);
-                $.confirm({
+             var jc = $.confirm({
                 theme: 'pix-default-modal',
                 title: 'Changing tweets state',
                 boxWidth: '600px',
                 useBootstrap: false,
                 backgroundDismiss: false,
-                content: 'Please click the search button again to refresh the result!',
+                content: 'Please Don\'t close the page.<div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
                 defaultButtons: false,
                 buttons: {
                     cancel: {
@@ -417,7 +399,50 @@ app.views.tweets = Backbone.View.extend({
                     }
                 }
             });
-        }, 'json');
+
+        if (force.checked){
+            $.post(app.appURL+'mark_search_tweets_force', data, function(response){
+                jc.close();
+                console.log(response);
+                    $.confirm({
+                    theme: 'pix-default-modal',
+                    title: 'Changing tweets state',
+                    boxWidth: '600px',
+                    useBootstrap: false,
+                    backgroundDismiss: false,
+                    content: 'Please click the search button again to refresh the result!',
+                    defaultButtons: false,
+                    buttons: {
+                        cancel: {
+                            text: 'OK',
+                            btnClass: 'btn-cancel'
+                        }
+                    }
+                });
+            }, 'json');
+        }else{
+
+
+            $.post(app.appURL+'mark_search_tweets', data, function(response){
+                jc.close();
+                console.log(response);
+                    $.confirm({
+                    theme: 'pix-default-modal',
+                    title: 'Changing tweets state',
+                    boxWidth: '600px',
+                    useBootstrap: false,
+                    backgroundDismiss: false,
+                    content: 'Please click the search button again to refresh the result!',
+                    defaultButtons: false,
+                    buttons: {
+                        cancel: {
+                            text: 'OK',
+                            btnClass: 'btn-cancel'
+                        }
+                    }
+                });
+            }, 'json');
+        }
 
 
         return false;

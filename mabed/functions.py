@@ -9,6 +9,9 @@ from mabed.es_corpus import Corpus
 from mabed.mabed import MABED
 from mabed.es_connector import Es_connector
 
+from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+from nltk.tokenize import word_tokenize
+
 __author__ = "Firas Odeh"
 __email__ = "odehfiras@gmail.com"
 
@@ -453,6 +456,7 @@ class Functions:
         # res = my_connector.bigSearch(query)
         res = my_connector.init_paginatedSearch(query)
         return res
+
 
     def get_cluster_tweets(self, index="test3", cid=0):
         my_connector = Es_connector(index=index)
@@ -902,6 +906,26 @@ class Functions:
         res = tweets_connector.update_query(query, session, state)
         return res
 
+    def set_search_status_force(self, index, session, state, word):
+        tweets_connector = Es_connector(index=index, doc_type="tweet")
+        session = 'session_'+session
+        query = {
+            "query": {
+                "bool": {
+                    "must": {
+                        "simple_query_string": {
+                            "fields": [
+                                "text"
+                            ],
+                            "query": word
+                        }
+                    }
+                }
+            }
+        }
+        res = tweets_connector.update_query(query, session, state)
+        return res
+
     def set_cluster_state(self, index, session, cid, state):
         tweets_connector = Es_connector(index=index, doc_type="tweet")
         # All tweets
@@ -941,3 +965,393 @@ class Functions:
                 }
             })
         return res
+
+
+
+
+    # ==================================================================
+    # Beta
+    # ==================================================================
+
+    def get_event_tweets_count(self, index="test3", main_term="", related_terms=""):
+        my_connector = Es_connector(index=index)
+        terms = []
+        words = main_term + ' '
+        for t in related_terms:
+            terms.append({ "match": {
+                    "text": {
+                        "query": t['word'],
+                        "boost": t['value']
+                    }
+                }})
+            words += t['word']+ " "
+        terms.append({"match": {
+            "text": {
+                "query": main_term,
+                "boost": 2
+            }
+        }})
+        query = {
+                "query": {
+                        "bool": {
+                            "should": terms
+                        }
+                    }
+                }
+        res = my_connector.count(query)
+        return res['count']
+
+    def get_event_state_tweets_count(self, index="test3", session="", words="", state="confirmed"):
+        my_connector = Es_connector(index=index)
+        query = {
+          "query": {
+            "bool": {
+               "must": [
+                {
+                  "match": {
+                    "text": {
+                      "query": words
+                    }
+                  }
+                }
+              ],
+              "filter": {
+                "bool": {
+                  "should": [
+                    {
+                      "match": {
+                        "session_"+session: state
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+        res = my_connector.count(query)
+        return res['count']
+
+    def get_words_tweets_count(self, index="test3", session="", words=""):
+        my_connector = Es_connector(index=index)
+        query = {
+          "query": {
+            "bool": {
+               "must": [
+                {
+                  "match": {
+                    "text": {
+                      "query": words
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+        res = my_connector.count(query)
+        return res['count']
+
+    def get_all_count(self, index="test3"):
+        my_connector = Es_connector(index=index)
+        query = {
+                "query": {
+                    "match_all": {}
+                  }
+                }
+        res = my_connector.count(query)
+        return res['count']
+
+    def get_words_count(self, index="test3", words=""):
+        my_connector = Es_connector(index=index)
+        query = {
+              "query": {
+                "simple_query_string": {
+                  "fields": [
+                    "text"
+                  ],
+                  "query": words
+                }
+              }
+            }
+        res = my_connector.count(query)
+        return res['count']
+
+
+    def get_start_date(self, index):
+        my_connector = Es_connector(index=index)
+        res = my_connector.search_size({
+              "_source": [
+                "@timestamp",
+                "timestamp_ms"
+              ],
+              "query": {
+                "match_all": {}
+              },
+              "sort": [
+                {
+                  "@timestamp": {
+                    "order": "asc"
+                  }
+                }
+              ]
+            },1)
+        return res['hits']['hits'][0]['_source']
+
+    def get_end_date(self, index):
+        my_connector = Es_connector(index=index)
+        res = my_connector.search_size({
+              "_source": [
+                "@timestamp",
+                "timestamp_ms"
+              ],
+              "query": {
+                "match_all": {}
+              },
+              "sort": [
+                {
+                  "@timestamp": {
+                    "order": "desc"
+                  }
+                }
+              ]
+            },1)
+        return res['hits']['hits'][0]['_source']
+
+    def get_range_count(self, index, start, end):
+        my_connector = Es_connector(index=index)
+        query = {
+              "query": {
+                "range": {
+                  "timestamp_ms": {
+                    "gt": str(start),
+                    "lt": str(end)
+                  }
+                }
+              }
+            }
+        print(query)
+        res = my_connector.count(query)
+        return res['count']
+
+    def process_range_tweets(self, index, start, end, words,count):
+        sw = 'stopwords/twitter_all.txt'
+        my_connector = Es_connector(index=index)
+        res = my_connector.range_tweets(start, end, sw, words,count)
+        return res
+
+    def process_w2v_tweets(self, index, words,count):
+        sw = 'stopwords/twitter_all.txt'
+        my_connector = Es_connector(index=index)
+        res = my_connector.w2v_tweets(sw, words,count)
+        return res
+
+
+    def get_event_central_tweets(self, index="test3", main_term="", related_terms=""):
+        my_connector = Es_connector(index=index)
+        terms = []
+        words = main_term + ' '
+        for t in related_terms:
+            terms.append({ "match": {
+                    "text": {
+                        "query": t['word'],
+                        "boost": t['value']
+                    }
+                }})
+            words += t['word']+ " "
+        terms.append({"match": {
+            "text": {
+                "query": main_term,
+                "boost": 2
+            }
+        }})
+        query = {
+            "sort": [
+                "_score"
+            ],
+                "query": {
+                        "bool": {
+                            "should": terms
+                        }
+                    }
+                }
+        res = my_connector.search_size(query,1)
+        return res
+
+    def get_event_tweets_bigsearch(self, index="test3", main_term="", related_terms=""):
+        my_connector = Es_connector(index=index)
+        terms = []
+        words = main_term + ' '
+        for t in related_terms:
+            terms.append({ "match": {
+                    "text": {
+                        "query": t['word'],
+                        "boost": t['value']
+                    }
+                }})
+            words += t['word']+ " "
+        terms.append({"match": {
+            "text": {
+                "query": main_term,
+                "boost": 2
+            }
+        }})
+        query = {
+            "sort": [
+                "_score"
+            ],
+            "query": {
+                "bool": {
+                    "should": terms
+                }
+            }
+        }
+
+        res = my_connector.bigTweetTextSearch(query)
+        return res
+
+
+    def getMean(self, index="test3", main_term="", related_terms=""):
+        my_connector = Es_connector(index=index)
+        terms = []
+        words = main_term + ' '
+        for t in related_terms:
+            terms.append({"match": {
+                "text": {
+                    "query": t['word'],
+                    "boost": t['value']
+                }
+            }})
+            words += t['word'] + " "
+        terms.append({"match": {
+            "text": {
+                "query": main_term,
+                "boost": 2
+            }
+        }})
+        query = {
+            "sort": [
+                "_score"
+            ],
+            "_source": [
+                "_score"
+            ],
+            "query": {
+                "bool": {
+                    "should": terms
+                }
+            }
+        }
+
+
+
+        query = {
+          "size": 0,
+            "query": {
+                "bool": {
+                    "should": terms
+                }
+            },
+          "aggs": {
+            "sum_scores": {
+              "sum": {
+                "script": "_score"
+              }
+            }
+          }
+        }
+        res = my_connector.search(query)
+        total = res['hits']['total']
+        sum = res['aggregations']['sum_scores']['value']
+        mean = sum / total
+        # res = my_connector.bigSearchMean(query)
+        return mean
+
+    def getSSE(self, index="test3", main_term="", related_terms="", mean=0):
+        my_connector = Es_connector(index=index)
+        terms = []
+        words = main_term + ' '
+        for t in related_terms:
+            terms.append({"match": {
+                "text": {
+                    "query": t['word'],
+                    "boost": t['value']
+                }
+            }})
+            words += t['word'] + " "
+        terms.append({"match": {
+            "text": {
+                "query": main_term,
+                "boost": 2
+            }
+        }})
+        query = {
+            "sort": [
+                "_score"
+            ],
+            "query": {
+                "bool": {
+                    "should": terms
+                }
+            }
+        }
+
+        res = my_connector.bigSearchSSE(query, mean)
+        return res
+
+
+    def d2v(self, tweet, data):
+        # data = ["I love machine learning. Its awesome.",
+        #         "I love coding in python",
+        #         "I love building chatbots python",
+        #         "they chat amagingly well",
+        #         "So we have saved the model and its ready for implementation. Lets play with it"]
+        print("=============================================================")
+        print("=============================================================")
+        print(tweet)
+        print("-------------")
+        print("-------------")
+
+        tagged_data = [TaggedDocument(words=word_tokenize(_d.lower()), tags=[str(i)]) for i, _d in enumerate(data)]
+
+        max_epochs = 100
+        vec_size = 20
+        alpha = 0.025
+
+        model = Doc2Vec(vector_size=vec_size,
+                        alpha=alpha,
+                        min_alpha=0.00025,
+                        min_count=1,
+                        dm=1)
+
+        model.build_vocab(tagged_data)
+
+        for epoch in range(max_epochs):
+            # print('iteration {0}'.format(epoch))
+            model.train(tagged_data,
+                        total_examples=model.corpus_count,
+                        epochs=model.iter)
+            # decrease the learning rate
+            model.alpha -= 0.0002
+            # fix the learning rate, no decay
+            model.min_alpha = model.alpha
+
+        # test_data = word_tokenize("So we have saved the model and its ready for implementation. Lets play with it".lower())
+        test_data = word_tokenize(tweet.lower())
+        v1 = model.infer_vector(test_data)
+        # print("V1_infer", v1)
+
+        # to find most similar doc using tags
+        similar_doc = model.docvecs.most_similar([v1])
+        print("similar_docs:")
+        print("-------------")
+        # print(similar_doc)
+        for doc in similar_doc:
+            print(data[int(doc[0])])
+            # print(doc[1])
+
+        print("=============================================================")
+        print("=============================================================")
+
+        # to find vector of doc in training data using tags or in other words, printing the vector of document at index 1 in training data
+        # print(model.docvecs['1'])

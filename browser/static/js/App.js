@@ -86,6 +86,22 @@ var app = (function() {
             }
             return this.mabedView;
         },
+			beta: function() {
+            if(!this.betaView) {
+                this.betaView = new api.views.beta({
+									model: api.eventsCollection
+								});
+            }
+            return this.betaView;
+        },
+			beta2: function() {
+            if(!this.beta2View) {
+                this.beta2View = new api.views.beta2({
+									model: api.eventsCollection
+								});
+            }
+            return this.beta2View;
+        },
 		client: function() {
 			if(!this.clientView) {
 				this.clientView = new api.views.client({
@@ -114,6 +130,8 @@ var app = (function() {
 			"tweets": "tweets",
 			"mabed": "mabed",
 			"events": "events",
+			"beta": "beta",
+			"beta2": "beta2",
 			"": "home"
 		},
         home: function() {
@@ -182,6 +200,28 @@ var app = (function() {
 						$('#nav-events').addClass('active');
             api
                 .title("Events")
+                .changeContent(view.$el);
+            view.render();
+						$('html,body').animate({scrollTop: 0}, 300);
+
+        },
+				beta: function(archive) {
+            var view = ViewsFactory.beta();
+						$('#mabed-nav .nav-item').removeClass('active');
+						$('#nav-beta').addClass('active');
+            api
+                .title("Beta")
+                .changeContent(view.$el);
+            view.render();
+						$('html,body').animate({scrollTop: 0}, 300);
+
+        },
+				beta2: function(archive) {
+            var view = ViewsFactory.beta2();
+						$('#mabed-nav .nav-item').removeClass('active');
+						$('#nav-beta2').addClass('active');
+            api
+                .title("Beta2")
                 .changeContent(view.$el);
             view.render();
 						$('html,body').animate({scrollTop: 0}, 300);
