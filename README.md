@@ -10,6 +10,12 @@ MABED requires scipy, numpy and networkx; these scientific libraries come pre-in
 	pip install scipy
 	pip install numpy
 	pip install networkx
+	...
+
+You can install all the required libraries (listed in the file `requirements.txt`) by executing the command:
+
+	pip install -r requirements.txt
+
 
 ## Usage
 
