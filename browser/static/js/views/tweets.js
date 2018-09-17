@@ -109,7 +109,6 @@ app.views.tweets = Backbone.View.extend({
                     if(media.media_url.endsWith("png")){
                         ext = "png";
                     }
-                        // imgs += '<a href="http://localhost/TwitterImages/'+app.session.s_index+'/'+tweet._source.id_str+"_"+i+'.'+ext+'" target="_blank"><img style="margin:2px;max-height:150px;width:auto;" src="http://localhost/TwitterImages/'+app.session.s_index+'/'+tweet._source.id_str+"_"+i+'.'+ext+'"></a>'
                         imgs += '<a href="'+app.imagesURL+app.session.s_index+'/'+tweet._source.id_str+"_"+i+'.'+ext+'" target="_blank"><img style="margin:2px;max-height:150px;width:auto;" src="'+app.imagesURL+app.session.s_index+'/'+tweet._source.id_str+"_"+i+'.'+ext+'"></a>'
               });
             }
@@ -149,7 +148,6 @@ app.views.tweets = Backbone.View.extend({
                 columnClass: 'col-md-12',
                 useBootstrap: true,
                 backgroundDismiss: false,
-                // content: html,
                 content: 'Loading... <div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
                 defaultButtons: false,
                 onContentReady: function () {

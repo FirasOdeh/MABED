@@ -18,13 +18,6 @@ var app = (function() {
 
 			this.eventsCollection = new app.collections.events();
 			this.imagesURL = 'http://mediamining.univ-lyon2.fr/~firas/TwitterImages/';
-
-			// if (localStorage.getItem('events') !== null) {
-			// 	var collectionString = localStorage.getItem('events');
-			// 	var collection = JSON.parse(collectionString);
-			// 	console.log(collection);
-			// 	this.eventsCollection.add_json_events(collection);
-			// }
 			if (localStorage.getItem('session_id') !== null) {
 				var sessionString = localStorage.getItem('session');
 				this.session = JSON.parse(sessionString);
@@ -34,15 +27,6 @@ var app = (function() {
 					// console.log(collection);
 					this.eventsCollection.add_json_events(collection);
 				}
-				// $.post('http://localhost:2016/get_session_results', {index: this.session_id}, function(res){
-				// 	console.log("get");
-				// 		console.log(res);
-				// 		if(res.result&&res.body.events){
-				// 			var collection = JSON.parse(res.body.events);
-				// 			console.log(collection);
-				// 			this.eventsCollection.add_json_events(collection);
-				// 		}
-				// });
 			}
 
 			Backbone.history.start();

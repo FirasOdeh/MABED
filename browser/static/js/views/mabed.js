@@ -4,34 +4,16 @@ app.views.mabed = Backbone.View.extend({
         'submit #run_mabed': 'run_mabed',
     },
     initialize: function() {
-        // this.render();
         var handler = _.bind(this.render, this);
     },
     render: function(){
         var html = this.template();
         this.$el.html(html);
         this.delegateEvents();
-        // $('#mabed_result').html(this.model);
-        //  var jc = $.confirm({
-        //     theme: 'pix-default-modal',
-        //     title: 'Saving Project',
-        //     boxWidth: '600px',
-        //     useBootstrap: false,
-        //     backgroundDismiss: true,
-        //     content: 'Please Don\'t close the page until you get the success notification.<div class=" jconfirm-box jconfirm-hilight-shake jconfirm-type-default  jconfirm-type-animated loading" role="dialog"></div>',
-        //     defaultButtons: false,
-        //     buttons: {
-        //         cancel: {
-        //             text: 'OK',
-        //             btnClass: 'btn-cancel'
-        //         }
-        //     },
-        // });
         return this;
     },
     run_mabed: function(e){
       e.preventDefault();
-      // localStorage.removeItem('events');
         if(!app.session){
           $.confirm({
                 title: 'Error',
@@ -71,7 +53,6 @@ app.views.mabed = Backbone.View.extend({
             }
         });
       $.post(app.appURL+'detect_events', data, function(response){
-          // console.log( response );
           $('#mabed_loading').fadeOut();
           jc.close();
           if(response.result){

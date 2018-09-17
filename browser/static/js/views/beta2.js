@@ -5,7 +5,6 @@ app.views.beta2 = Backbone.View.extend({
         'click .start_btn': 'start_btn'
     },
     initialize: function() {
-        // this.render();
         var handler = _.bind(this.render, this);
     },
     render: function(){
@@ -280,27 +279,14 @@ app.views.beta2 = Backbone.View.extend({
         animationEnabled: true,
         theme: "light2",
         axisX: {
-            // title: "Number of new keywords"
-            // title: "keywords (sorted by SSE in an increasing order)"
             title: "keywords"
         },
         axisY: {
             title: "Intersection percentage"
-            // title: "Mean score"
         },
         data: [{
             type: "line",
             dataPoints: points
-            // dataPoints: [
-            //     { x:1, y: 450 },
-            //     { x:2, y: 440 },
-            //     { x:3, y: 430, indexLabel: "highest",markerColor: "red"},
-            //     { x:4, y: 420 },
-            //     { x:5, y: 410 },
-            //     { x:6, y: 400 },
-            //     { x:7, y: 390 },
-            //     { x:8, y: 380 }
-            // ]
         }]
     });
     chart.render();
