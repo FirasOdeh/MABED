@@ -13,7 +13,6 @@ if __name__ == '__main__':
     args = p.parse_args()
     print('File: %s\nIndex: %s\n' % (args.f, args.i))
 
-    # with open('twitter2016.json') as f:
     with open(args.f) as f:
         data = json.load(f)
 
@@ -28,15 +27,12 @@ if __name__ == '__main__':
         for img in cluster:
             imgs+=1
             matchObj = re.match(r'(\d*)_(.*).(.*)', img, re.M | re.I)
-            # print(matchObj.group(1))
             res = my_connector.search({
                 "query": {
                         "term": {"id_str": matchObj.group(1)}
                     }})
             if res['hits']['total']>0:
-                # print(matchObj.group(1))
                 id= res['hits']['hits'][0]['_id']
-                # print(id)
                 if 'imagesCluster' in res['hits']['hits'][0]['_source']:
                     arr = res['hits']['hits'][0]['_source']['imagesCluster']
                     if isinstance(arr, list):
@@ -51,7 +47,6 @@ if __name__ == '__main__':
                     update = my_connector.update_field(id, 'imagesCluster', [c_count])
                 count += res['hits']['total']
         c_count += 1
-
         print('-----------------------')
     print('images %d' % imgs)
     print('count %d' % count)

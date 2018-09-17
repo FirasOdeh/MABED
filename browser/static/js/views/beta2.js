@@ -134,7 +134,7 @@ app.views.beta2 = Backbone.View.extend({
                     });
                     var html = '<tr>' +
                         '    <td>' + att.main_term + '</td>' +
-                        '    <td>' + related_html + '</td>' +
+                        // '    <td>' + related_html + '</td>' +
                         '    <td>' + new_html + '</td>' +
                         '</tr>';
                     $('#keywords').append(html);
@@ -214,11 +214,12 @@ app.views.beta2 = Backbone.View.extend({
 
                     var s5_table = '';
                     $.each(s5.testList, function(i, res){
+                        var wcount = res.words.split(' ').length;
                         // testpercent = parseFloat((res.testValConfirmedCount/res.testValCount)*100).toFixed(2);
                         testpercent = parseFloat((res.testValConfirmedCount/(res.reviewedTweetsCount))*100).toFixed(2);
                         s5_table += '<tr>' +
                         '    <td>' + parseFloat(res.val).toFixed(2)+ '</td>' +
-                        '    <td>'+ res.words +'</td>' +
+                        '    <td>'+ res.words +' ('+wcount+')</td>' +
                         '    <td>'+ res.testValCount +'</td>' +
                         '    <td>'+ res.reviewedTweetsCount +'</td>' +
                         '    <td>'+ res.testValConfirmedCount +'</td>' +
@@ -284,7 +285,7 @@ app.views.beta2 = Backbone.View.extend({
             title: "keywords"
         },
         axisY: {
-            title: "Intersection"
+            title: "Intersection percentage"
             // title: "Mean score"
         },
         data: [{

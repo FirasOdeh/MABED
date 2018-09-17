@@ -109,14 +109,12 @@ def detect_events():
     events=""
     res = False
     if filter=="all":
-        events = "all events"
         events = functions.event_descriptions(index, k, maf, mrf, tsl, p, theta, sigma, cluster)
     elif filter == "proposedconfirmed":
         filter = ["proposed","confirmed"]
         events = functions.filtered_event_descriptions(index, k, maf, mrf, tsl, p, theta, sigma, session, filter, cluster)
     else:
         events = functions.filtered_event_descriptions(index, k, maf, mrf, tsl, p, theta, sigma, session, [filter], cluster)
-
     if not events:
         events = "No Result!"
     else:
@@ -132,7 +130,6 @@ def detect_events():
 def images():
     with open('twitter2015.json') as f:
         data = json.load(f)
-
     clusters_num = len(data['duplicates'])
     clusters = data['duplicates']
     return render_template('images.html',
@@ -181,7 +178,6 @@ def event_tweets():
     main_term = event['main_term'].replace(",", " ")
     related_terms = event['related_terms']
     tweets = functions.get_event_tweets(index, main_term, related_terms)
-    # tweets = tweets['hits']['hits']
     clusters = functions.get_event_clusters(index, main_term, related_terms)
     return jsonify({"tweets": tweets, "clusters": clusters})
 
@@ -197,7 +193,6 @@ def event_filter_tweets():
     main_term = event['main_term'].replace(",", " ")
     related_terms = event['related_terms']
     tweets = functions.get_event_filter_tweets(index, main_term, related_terms, state, session)
-    # tweets = tweets['hits']['hits']
     clusters = functions.get_event_clusters(index, main_term, related_terms)
     return jsonify({"tweets": tweets, "clusters": clusters})
 
@@ -219,10 +214,8 @@ def cluster_tweets():
     event = json.loads(data['obj'])
     main_term = event['main_term'].replace(",", " ")
     related_terms = event['related_terms']
-    # clusters = functions.get_event_clusters(index, main_term, related_terms)
     tres = functions.get_event_tweets2(index, main_term, related_terms, cid)
     event_tweets = tres
-    # event_tweets = 0
     res = functions.get_cluster_tweets(index, cid)
     tweets = res['hits']['hits']
     tweets = {"results":tweets}
@@ -268,7 +261,6 @@ def mark_valid():
     return jsonify(res)
 
 
-
 @app.route('/mark_event', methods=['POST', 'GET'])
 # @cross_origin()
 def mark_event():
@@ -277,6 +269,7 @@ def mark_event():
     session = data['session']
     functions.set_status(index, session, data)
     return jsonify(data)
+
 
 @app.route('/mark_cluster', methods=['POST', 'GET'])
 # @cross_origin()
@@ -288,6 +281,7 @@ def mark_cluster():
     state = data['state']
     res = functions.set_cluster_state(index, session, cid, state)
     return jsonify(res)
+
 
 @app.route('/mark_tweet', methods=['POST', 'GET'])
 # @cross_origin()
@@ -312,6 +306,7 @@ def mark_search_tweets():
     functions.set_search_status(index, session, state, word)
     return jsonify(data)
 
+
 @app.route('/mark_search_tweets_force', methods=['POST', 'GET'])
 def mark_search_tweets_force():
     data = request.form
@@ -322,16 +317,18 @@ def mark_search_tweets_force():
     functions.set_search_status_force(index, session, state, word)
     return jsonify(data)
 
+
 @app.route('/delete_field', methods=['POST', 'GET'])
 # @cross_origin()
 def delete_field():
     up1 = functions.update_all("twitter2017", "tweet", "imagesCluster", "")
-    # up = functions.delete_session("s1")
     return jsonify(up1)
+
 
 # ==================================================================
 # 5. Export
 # ==================================================================
+
 
 @app.route('/export_events', methods=['POST', 'GET'])
 # @cross_origin()
@@ -354,6 +351,7 @@ def export_events():
     # return Response(str(events),
     #     mimetype='application/json',
     #     headers={'Content-Disposition': 'attachment;filename=events.json'})
+
 
 @app.route('/export_tweets', methods=['POST', 'GET'])
 # @cross_origin()
@@ -384,17 +382,10 @@ def export_tweets():
 # @cross_origin()
 def export_confirmed_tweets():
     session = request.args.get('session')
-
-    # data = request.form
-    # session = data['session_id']
-    # res = functions.get_session(session)
     res = functions.get_session(session)
     index = res['_source']['s_index']
     s_name = res['_source']['s_name']
     tweets = functions.export_event(index,s_name)
-
-
-    # return jsonify("tweets")
     return Response(str(tweets),
                 mimetype='application/json',
                 headers={'Content-Disposition':'attachment;filename='+s_name+'tweets.json'})
@@ -853,5 +844,5 @@ def index(user):
 
 if __name__ == '__main__':
     functions = Functions()
-    # app.run(debug=True, host='localhost', port=5000, threaded=True)
-    app.run(debug=False, host='mediamining.univ-lyon2.fr', port=5000, threaded=True)
+    app.run(debug=True, host='localhost', port=5000, threaded=True)
+    # app.run(debug=False, host='mediamining.univ-lyon2.fr', port=5000, threaded=True)
