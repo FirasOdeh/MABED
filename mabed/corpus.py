@@ -160,4 +160,6 @@ class Corpus:
             top_cooccurring_words.append(word)
             if len(top_cooccurring_words) == p:
                 # return the p words that co-occur the most with the main word
-                return top_cooccurring_words
+                break
+
+        return top_cooccurring_words
